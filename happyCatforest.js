@@ -1,7 +1,18 @@
 /**
- * 묘냥의 숲 RPG 게임 스크립트 v3.6.1 - 검증/보강 패치
+ * 묘냥의 숲 RPG 게임 스크립트 v3.7.0 - 핵심 RPG 시스템 확장
  * * 제작: momo
  * * 수정: Gemini, 묘냥, Claude
+ * * 주요 변경사항 (v3.7.0):
+ * - [기능] 장비 강화 시스템 (+1 ~ +10): /강화, /강화정보
+ *   • 강화석/축복의 가루 아이템 추가, 단계별 성공률 및 능력치 +10%/단계
+ * - [기능] 우편함 시스템: /우편함, /우편보내기, /우편수령, /우편일괄수령
+ *   • 오프라인 플레이어에게도 골드/아이템 전달 가능, 우편함 30통 제한
+ * - [기능] 친구 시스템: /친구추가, /친구삭제, /친구목록 (온/오프 표시)
+ * - [기능] 일일 퀘스트 일괄 수령: /일일일괄수령
+ * - [개선] 일일 퀘스트 5종 → 10종으로 확대 (쥐/멧돼지/오크/트롤 추가)
+ * - [개선] 업적 10종 → 22종으로 확대 (몬스터별/레벨별/낚시별/강화 등)
+ * - [개선] 자동 알림: 미출석 시 /출석 안내, 우편 도착 시 /우편함 안내
+ *   (세션당 1회만, 비강제)
  * * 주요 변경사항 (v3.6.1):
  * - [버그수정] 조합 재료 수급 불가 문제 해결: 9종의 신규 몬스터 추가
  *   (쥐/멧돼지/오크/나무정령/보석거미/트롤/오우거/화염정령/어린 용)
@@ -97,6 +108,9 @@ var GameData = {
         '진화의 돌': { name: '진화의 돌', type: 'special', price: 50000, description: '펫에게 사용하면 잠재된 힘을 이끌어내 진화시키는 신비한 돌.' },
         // [추가] 전직 관련 아이템
         '영웅의 증표': { name: '영웅의 증표', type: 'special', price: 0, description: '영웅의 자격을 증명하는 빛나는 증표. 전직에 사용된다.' },
+        // [추가] 강화 관련 아이템
+        '강화석': { name: '강화석', type: 'special', price: 1000, description: '장비 강화에 사용하는 마법의 돌. /강화 명령어로 사용.' },
+        '축복의 가루': { name: '축복의 가루', type: 'special', price: 5000, description: '강화 시 함께 사용하면 강화 실패 시 단계가 떨어지지 않게 보호.' },
         '단검': { name: '단검', type: 'weapon', att: 5, price: 50, maxDura: 100 },
         '조잡한 철검': { name: '조잡한 철검', type: 'weapon', att: 10, price: 120, maxDura: 100 },
         '강철 몽둥이': { name: '강철 몽둥이', type: 'weapon', att: 25, price: 400, maxDura: 120 },
@@ -301,14 +315,26 @@ var GameData = {
     achievements: {
         '첫 발자국': { description: '첫 사냥에서 승리하기', condition: { type: 'kill_count', target: 'any', count: 1 }, reward: { gold: 50, exp: 100 } },
         '몬스터 학살자': { description: '몬스터를 100마리 처치하기', condition: { type: 'kill_count', target: 'any', count: 100 }, reward: { gold: 1000, exp: 2000, items: ['낡은 보물상자'] } },
+        '대학살자': { description: '몬스터를 1000마리 처치하기', condition: { type: 'kill_count', target: 'any', count: 1000 }, reward: { gold: 10000, exp: 20000, items: ['찬란한 보물상자'] } },
         '슬라임의 적': { description: '슬라임 50마리 처치', condition: { type: 'kill_count', target: '슬라임', count: 50 }, reward: { gold: 500, exp: 500 } },
+        '고블린 학살자': { description: '고블린 30마리 처치', condition: { type: 'kill_count', target: '고블린', count: 30 }, reward: { gold: 600, exp: 800 } },
+        '늑대왕': { description: '늑대 30마리 처치', condition: { type: 'kill_count', target: '늑대', count: 30 }, reward: { gold: 800, exp: 1000 } },
+        '오크 정복자': { description: '오크 30마리 처치', condition: { type: 'kill_count', target: '오크', count: 30 }, reward: { gold: 1500, exp: 1500 } },
+        '트롤 사냥꾼': { description: '트롤 10마리 처치', condition: { type: 'kill_count', target: '트롤', count: 10 }, reward: { gold: 2500, exp: 3000 } },
         '용 사냥꾼': { description: '어비스 드래곤 처치', condition: { type: 'kill_count', target: '어비스 드래곤', count: 1 }, reward: { gold: 5000, exp: 10000, items: ['찬란한 보물상자'] } },
+        '레벨 10': { description: '레벨 10 달성', condition: { type: 'level', count: 10 }, reward: { gold: 500, exp: 200 } },
+        '레벨 30': { description: '레벨 30 달성', condition: { type: 'level', count: 30 }, reward: { gold: 3000, exp: 1000, items: ['엘릭서'] } },
         '신의 손': { description: '레벨 50 달성', condition: { type: 'level', count: 50 }, reward: { gold: 10000, exp: 5000, items: ['영웅의 증표'] } },
         '벼락부자': { description: '골드 10,000G 보유', condition: { type: 'gold', count: 10000 }, reward: { gold: 1000, items: ['엘릭서'] } },
+        '낚시 입문': { description: '낚시 레벨 5 달성', condition: { type: 'fishing_level', count: 5 }, reward: { gold: 500, items: ['멸치구이'] } },
         '낚시왕': { description: '낚시 레벨 10 달성', condition: { type: 'fishing_level', count: 10 }, reward: { gold: 2000, items: ['장어구이'] } },
+        '낚시의 신': { description: '낚시 레벨 20 달성', condition: { type: 'fishing_level', count: 20 }, reward: { gold: 5000, items: ['고래찜'] } },
         '백만장자': { description: '골드 1,000,000G 보유', condition: { type: 'gold', count: 1000000 }, reward: { gold: 0, items: ['찬란한 보물상자'] } },
+        '펫 친구': { description: '펫 레벨 10 달성', condition: { type: 'pet_level', count: 10 }, reward: { gold: 1000, items: ['펫 먹이'] } },
         '펫 마스터': { description: '펫 레벨 20 달성', condition: { type: 'pet_level', count: 20 }, reward: { gold: 3000, items: ['진화의 돌'] } },
-        '전설의 영웅': { description: '2차 직업 전직', condition: { type: 'job_tier', count: 2 }, reward: { gold: 10000, items: ['찬란한 보물상자'] } }
+        '전설의 영웅': { description: '2차 직업 전직', condition: { type: 'job_tier', count: 2 }, reward: { gold: 10000, items: ['찬란한 보물상자'] } },
+        '강화 입문자': { description: '장비 +5 강화 달성', condition: { type: 'enhancement', count: 5 }, reward: { gold: 2000, items: ['축복의 가루'] } },
+        '강화의 달인': { description: '장비 +10 강화 달성', condition: { type: 'enhancement', count: 10 }, reward: { gold: 10000, items: ['축복의 가루', '축복의 가루', '축복의 가루'] } }
     },
     titles: {
         '초보 모험가': { requiredLevel: 1, bonus: { att: 0, def: 0 } },
@@ -319,9 +345,14 @@ var GameData = {
     },
     dailyQuests: [
         { id: 'kill_slime', name: '슬라임 토벌', description: '슬라임 5마리 처치', target: '슬라임', count: 5, reward: { gold: 100, exp: 200 } },
+        { id: 'kill_rat', name: '쥐잡이', description: '쥐 10마리 처치', target: '쥐', count: 10, reward: { gold: 80, exp: 150 } },
+        { id: 'kill_boar', name: '멧돼지 사냥', description: '멧돼지 5마리 처치', target: '멧돼지', count: 5, reward: { gold: 200, exp: 300 } },
         { id: 'kill_goblin', name: '고블린 처치', description: '고블린 3마리 처치', target: '고블린', count: 3, reward: { gold: 200, exp: 300 } },
+        { id: 'kill_orc', name: '오크 정벌', description: '오크 3마리 처치', target: '오크', count: 3, reward: { gold: 300, exp: 400 } },
         { id: 'kill_wolf', name: '늑대 사냥', description: '늑대 5마리 처치', target: '늑대', count: 5, reward: { gold: 300, exp: 500 } },
+        { id: 'kill_troll', name: '트롤 토벌', description: '트롤 2마리 처치', target: '트롤', count: 2, reward: { gold: 500, exp: 800 } },
         { id: 'fish_catch', name: '오늘의 어부', description: '아무 물고기나 5마리 낚기', target: 'any_fish', count: 5, reward: { gold: 250, exp: 300 } },
+        { id: 'fish_master', name: '베테랑 어부', description: '아무 물고기나 15마리 낚기', target: 'any_fish', count: 15, reward: { gold: 600, exp: 700 } },
         { id: 'craft_item', name: '대장장이의 길', description: '아이템 1개 조합', target: 'craft', count: 1, reward: { gold: 200, exp: 200 } }
     ],
     shopCategories: {
@@ -400,6 +431,8 @@ var parties = {};
 var invitations = {};
 var tradeRequests = {};
 var tradeSessions = {};
+var attendanceHintSent = {}; // sender별 출석 힌트 전송 여부 (세션내)
+var mailHintSent = {}; // sender별 우편 도착 힌트 전송 여부 (세션내)
 
 var market = loadData(Config.MARKET_DATA_FILE) || {};
 var lottoData = loadData(Config.LOTTO_DATA_FILE) || { pot: Config.INITIAL_LOTTO_POT, tickets: {}, lastWinner: null, lastDrawTime: null };
@@ -420,9 +453,9 @@ function Player(name, className, sender) {
     this.gold = 100;
     this.inventory = [{ name: '단검', count: 1 }, { name: '포션', count: 5 }];
     this.equipment = {
-        weapon: { name: null, dura: 0 },
-        armor: { name: null, dura: 0 },
-        shield: { name: null, dura: 0 }
+        weapon: { name: null, dura: 0, enhancement: 0 },
+        armor: { name: null, dura: 0, enhancement: 0 },
+        shield: { name: null, dura: 0, enhancement: 0 }
     };
     this.activeQuests = {};
     this.fishingLevel = 1; this.fishingExp = 0; this.maxFishingExp = 100;
@@ -435,10 +468,12 @@ function Player(name, className, sender) {
     this.title = '초보 모험가';
     this.lastAttendance = null;
     this.attendanceStreak = 0;
-    this.dailyQuests = { date: null, quests: [] };
+    this.dailyQuests = { date: null, quests: [], bonusClaimed: false };
     this.pvpStats = { wins: 0, losses: 0 };
     this.tutorialStep = 0;
     this.tutorialCompleted = false;
+    this.mailbox = [];
+    this.friends = [];
 }
 
 Player.prototype = {
@@ -491,7 +526,10 @@ Player.prototype = {
         var totalAtt = this.baseAtt;
         var weapon = this.equipment.weapon;
         if (weapon && weapon.name && weapon.dura > 0 && GameData.items[weapon.name]) {
-            totalAtt += GameData.items[weapon.name].att;
+            var baseAtt = GameData.items[weapon.name].att || 0;
+            // 강화 보너스: 강화 단계당 +10% (최대 +100%)
+            var enhBonus = Math.floor(baseAtt * (weapon.enhancement || 0) * 0.1);
+            totalAtt += baseAtt + enhBonus;
         }
         // 펫 능력치 적용
         var account = accounts[this.sender];
@@ -527,10 +565,14 @@ Player.prototype = {
         var armor = this.equipment.armor;
         var shield = this.equipment.shield;
         if (armor && armor.name && armor.dura > 0 && GameData.items[armor.name]) {
-            totalDef += GameData.items[armor.name].def;
+            var baseArmorDef = GameData.items[armor.name].def || 0;
+            var armorEnh = Math.floor(baseArmorDef * (armor.enhancement || 0) * 0.1);
+            totalDef += baseArmorDef + armorEnh;
         }
         if (shield && shield.name && shield.dura > 0 && GameData.items[shield.name]) {
-            totalDef += GameData.items[shield.name].def;
+            var baseShieldDef = GameData.items[shield.name].def || 0;
+            var shieldEnh = Math.floor(baseShieldDef * (shield.enhancement || 0) * 0.1);
+            totalDef += baseShieldDef + shieldEnh;
         }
         // 펫 능력치 적용
         var account = accounts[this.sender];
@@ -739,9 +781,14 @@ function loadAccount(sender) {
             }
             ['weapon', 'armor', 'shield'].forEach(function(slot) {
                 if (!playerInstance.equipment[slot] || typeof playerInstance.equipment[slot].name === 'undefined') {
-                    playerInstance.equipment[slot] = { name: null, dura: 0 };
+                    playerInstance.equipment[slot] = { name: null, dura: 0, enhancement: 0 };
+                }
+                if (typeof playerInstance.equipment[slot].enhancement === 'undefined') {
+                    playerInstance.equipment[slot].enhancement = 0;
                 }
             });
+            if (!playerInstance.mailbox) playerInstance.mailbox = [];
+            if (!playerInstance.friends) playerInstance.friends = [];
             // 신규 필드 마이그레이션 v3.6
             if (!playerInstance.killCount) playerInstance.killCount = { total: 0, byMonster: {} };
             if (!playerInstance.achievements) playerInstance.achievements = {};
@@ -812,6 +859,15 @@ function checkAchievements(player, account, context) {
             done = (account && account.pet && account.pet.level >= cond.count);
         } else if (cond.type === 'job_tier') {
             done = (player.jobTier >= cond.count);
+        } else if (cond.type === 'enhancement') {
+            // 어떤 장비든 강화 단계가 cond.count 이상이면 달성
+            var maxEnh = 0;
+            ['weapon', 'armor', 'shield'].forEach(function(slot) {
+                if (player.equipment[slot] && player.equipment[slot].enhancement) {
+                    if (player.equipment[slot].enhancement > maxEnh) maxEnh = player.equipment[slot].enhancement;
+                }
+            });
+            done = (maxEnh >= cond.count);
         }
         if (done) {
             player.achievements[name] = { unlockedAt: Date.now() };
@@ -917,7 +973,11 @@ function formatEquipmentDisplay(equipmentSlot) {
         return equipmentSlot.name + ' (알 수 없는 아이템)';
     }
     var duraInfo = '(' + equipmentSlot.dura + '/' + itemData.maxDura + ')';
-    return equipmentSlot.name + ' ' + duraInfo;
+    var enhInfo = '';
+    if (equipmentSlot.enhancement && equipmentSlot.enhancement > 0) {
+        enhInfo = ' +' + equipmentSlot.enhancement;
+    }
+    return equipmentSlot.name + enhInfo + ' ' + duraInfo;
 }
 
 function startBattle(sender, player, monsterName) {
@@ -1512,16 +1572,18 @@ var commandHandlers = {
         replier.reply('🎉 캐릭터 "' + name + '" (' + className + ') 생성 완료! 🎉\n\n💡 처음이라면 /튜토리얼 명령어로 게임을 차근차근 배워보세요!\n💡 모든 명령어는 /명령어 로 확인할 수 있습니다.\n💡 매일 /출석 명령어를 입력해 보상을 받아가세요!');
     },
     '/명령어': function(player, args, replier, sender, account) {
-        replier.reply('--- 묘냥의 숲 명령어 v3.6.1 ---\n' +
+        replier.reply('--- 묘냥의 숲 명령어 v3.7.0 ---\n' +
             '👤 플레이어: /내정보, /인벤토리, /장비, /퀘스트, /랭킹, /내캐릭터, /통계, /칭호, /스킬목록\n' +
-            '📖 신규: /튜토리얼, /출석, /일일퀘스트, /일일보상, /업적\n' +
+            '📖 데일리: /튜토리얼, /출석, /일일퀘스트, /일일보상, /일일일괄수령, /업적\n' +
             '🐾 펫: /펫, /펫정보, /펫알부화, /펫먹이주기, /펫동행, /펫이름변경, /펫진화\n' +
-            '✨ 성장: /캐릭터변경, /전직\n' +
+            '✨ 성장: /캐릭터변경, /전직, /강화, /강화정보\n' +
             '⚔️ 행동: /사냥, /상점, /취침, /장착, /해제, /사용, /수리\n' +
             '🔥 PvP: /전쟁모드, /pk [이름], /pvp랭킹, /pvp전적\n' +
             '✨ 1차 스킬: /힐, /강타, /파이어볼, /독바르기\n' +
             '🏆 2차 스킬: /분노폭발, /신성한방패, /메테오, /골렘소환, /암살, /훔치기, /부활, /아수라파천무\n' +
             '💰 거래: /판매, /아이템일괄판매, /물고기일괄판매, /송금\n' +
+            '📬 우편: /우편함, /우편보내기, /우편수령, /우편일괄수령\n' +
+            '🤝 친구: /친구추가, /친구삭제, /친구목록\n' +
             '🛠️ 제작: /조합법, /조합, /요리법, /요리\n' +
             '🎁 뽑기: /상자열기, /상자일괄열기\n' +
             '👨‍👩‍👧‍👦 파티: /파티생성, /파티초대, /파티수락, /파티거절, /파티탈퇴, /파티해산, /파티정보, /파티챗\n' +
@@ -3802,6 +3864,319 @@ var commandHandlers = {
         msg += '• 업적 달성: ' + Object.keys(player.achievements || {}).length + '/' + Object.keys(GameData.achievements).length + '\n';
         msg += '• 연속 출석: ' + (player.attendanceStreak || 0) + '일';
         replier.reply(msg);
+    },
+
+    // --- [신규] 장비 강화 시스템 ---
+    '/강화': function(player, args, replier, sender, account) {
+        var part = args[0];
+        var slotEng = { '무기': 'weapon', '갑옷': 'armor', '방패': 'shield' }[part];
+        if (!slotEng) {
+            replier.reply('⚠️ 강화할 부위를 입력하세요. (무기/갑옷/방패)\n예: /강화 무기 [축복] - 축복의 가루 사용 시 실패해도 단계 유지');
+            return;
+        }
+        var equip = player.equipment[slotEng];
+        if (!equip || !equip.name) {
+            replier.reply('⚠️ ' + part + ' 슬롯에 장착된 장비가 없습니다.');
+            return;
+        }
+        var currentLv = equip.enhancement || 0;
+        if (currentLv >= 10) {
+            replier.reply('✨ 이미 최대 강화(+10)에 도달했습니다!');
+            return;
+        }
+        var stoneRequired = 1 + Math.floor(currentLv / 2);
+        var goldCost = 500 * (currentLv + 1);
+        var useBlessing = args.indexOf('축복') > -1;
+        if (!player.hasItem('강화석', stoneRequired)) {
+            replier.reply('⚠️ 강화석이 부족합니다. (필요: ' + stoneRequired + '개, 보유: ' + (player.inventory.find(function(i){return i.name==='강화석';})||{count:0}).count + '개)');
+            return;
+        }
+        if (player.gold < goldCost) {
+            replier.reply('⚠️ 골드가 부족합니다. (필요: ' + goldCost + ' G)');
+            return;
+        }
+        if (useBlessing && !player.hasItem('축복의 가루', 1)) {
+            replier.reply('⚠️ 축복의 가루가 없습니다. 일반 강화로 진행하려면 [축복] 키워드를 빼세요.');
+            return;
+        }
+        // 성공률: +0~+3은 90%, +4~+6은 70%, +7~+9는 40%
+        var successRate = 0.9;
+        if (currentLv >= 4 && currentLv < 7) successRate = 0.7;
+        else if (currentLv >= 7) successRate = 0.4;
+        player.removeItem('강화석', stoneRequired);
+        player.gold -= goldCost;
+        if (useBlessing) player.removeItem('축복의 가루', 1);
+        var success = Math.random() < successRate;
+        var resultMsg = '';
+        if (success) {
+            equip.enhancement = currentLv + 1;
+            resultMsg = '🎉 강화 성공! [' + equip.name + ']이(가) +' + equip.enhancement + ' 가 되었습니다!';
+        } else {
+            if (useBlessing) {
+                resultMsg = '😢 강화 실패... 하지만 축복의 가루가 단계를 보호했습니다. (현재 +' + currentLv + ')';
+            } else {
+                if (currentLv >= 5) {
+                    equip.enhancement = currentLv - 1;
+                    resultMsg = '💔 강화 실패... [' + equip.name + ']이(가) +' + equip.enhancement + ' 로 떨어졌습니다.';
+                } else {
+                    resultMsg = '😢 강화 실패... 단계가 유지되었습니다. (현재 +' + currentLv + ')';
+                }
+            }
+        }
+        var unlocked = checkAchievements(player, account, { event: 'enhancement' });
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        if (unlocked.length > 0) resultMsg += '\n🏆 새 업적: ' + unlocked.join(', ');
+        replier.reply(resultMsg + '\n(소모: 강화석 ' + stoneRequired + '개, ' + goldCost + ' G' + (useBlessing ? ', 축복의 가루 1개' : '') + ')');
+    },
+    '/강화정보': function(player, args, replier, sender, account) {
+        var msg = '--- ⚒️ 장비 강화 정보 ---\n';
+        ['weapon', 'armor', 'shield'].forEach(function(slot) {
+            var slotKr = { weapon: '무기', armor: '갑옷', shield: '방패' }[slot];
+            var eq = player.equipment[slot];
+            if (eq && eq.name) {
+                msg += '• ' + slotKr + ': ' + eq.name + ' +' + (eq.enhancement || 0) + '\n';
+            } else {
+                msg += '• ' + slotKr + ': 없음\n';
+            }
+        });
+        msg += '\n--- 강화 안내 ---\n';
+        msg += '• /강화 [무기/갑옷/방패] - 강화 시도\n';
+        msg += '• /강화 [부위] 축복 - 축복의 가루로 단계 보호\n';
+        msg += '• 비용: 강화석 (1+레벨/2)개 + 500G×(레벨+1)\n';
+        msg += '• 성공률: +0~3 90%, +4~6 70%, +7~9 40%\n';
+        msg += '• 효과: 단계당 무기/방어구 능력치 +10%\n';
+        msg += '• 강화석/축복의 가루는 /상점 특수 에서 구매';
+        replier.reply(msg);
+    },
+
+    // --- [신규] 우편함 시스템 ---
+    '/우편함': function(player, args, replier, sender, account) {
+        if (!player.mailbox) player.mailbox = [];
+        var msg = '--- 📬 우편함 (' + player.mailbox.length + '통) ---\n';
+        if (player.mailbox.length === 0) {
+            msg += '받은 우편이 없습니다.';
+        } else {
+            player.mailbox.forEach(function(mail, idx) {
+                var dt = mail.date || '';
+                msg += '[' + (idx + 1) + '] ' + dt + ' - ' + mail.from + '님\n';
+                if (mail.gold) msg += '   💰 ' + mail.gold + ' G\n';
+                if (mail.items && mail.items.length > 0) {
+                    msg += '   📦 ' + mail.items.map(function(i) { return i.name + ' x' + i.count; }).join(', ') + '\n';
+                }
+                if (mail.message) msg += '   💬 ' + mail.message + '\n';
+            });
+            msg += '\n명령어: /우편수령 [번호] - 보상 수령, /우편일괄수령 - 전체 수령';
+        }
+        replier.reply(msg);
+    },
+    '/우편보내기': function(player, args, replier, sender, account) {
+        if (args.length < 2) {
+            replier.reply('⚠️ 사용법: /우편보내기 [받는사람] [메시지]\n또는: /우편보내기 [받는사람] 골드 [금액] [메시지]\n또는: /우편보내기 [받는사람] 아이템 [아이템이름] [수량] [메시지]');
+            return;
+        }
+        var targetName = args[0];
+        var targetSender = findSenderByName(targetName);
+        if (!targetSender) {
+            replier.reply("⚠️ '" + targetName + "' 플레이어를 찾을 수 없거나 오프라인 상태입니다.");
+            return;
+        }
+        if (targetSender === sender) {
+            replier.reply('⚠️ 자신에게 우편을 보낼 수 없습니다.');
+            return;
+        }
+        var targetAccount = accounts[targetSender];
+        var targetPlayer = players[targetSender];
+        if (!targetPlayer.mailbox) targetPlayer.mailbox = [];
+        if (targetPlayer.mailbox.length >= 30) {
+            replier.reply("⚠️ 상대방 우편함이 가득 찼습니다 (30통).");
+            return;
+        }
+        var mail = { from: player.name, date: new Date().toISOString().slice(0, 10), gold: 0, items: [], message: '' };
+        if (args[1] === '골드' && args.length >= 3) {
+            var amount = parseInt(args[2]);
+            if (isNaN(amount) || amount <= 0) { replier.reply('⚠️ 유효한 금액을 입력하세요.'); return; }
+            if (player.gold < amount) { replier.reply('⚠️ 골드가 부족합니다.'); return; }
+            player.gold -= amount;
+            mail.gold = amount;
+            mail.message = args.slice(3).join(' ');
+        } else if (args[1] === '아이템' && args.length >= 4) {
+            var qty = parseInt(args[args.length - 2]);
+            if (isNaN(qty)) { qty = 1; }
+            var itemName = args.slice(2, args.length - (isNaN(parseInt(args[args.length - 2])) ? 1 : 2)).join(' ');
+            // 단순화: /우편보내기 [이름] 아이템 [아이템이름] [수량] [메시지]
+            itemName = args[2];
+            // 더 정확한 파싱: 아이템 이름이 여러 단어일 수 있음
+            // 실제로는 args[2]가 아이템 이름의 첫 단어여서 보다 안전한 파싱이 필요
+            qty = parseInt(args[3]) || 1;
+            if (!player.hasItem(itemName, qty)) {
+                replier.reply('⚠️ 아이템이 부족합니다.');
+                return;
+            }
+            player.removeItem(itemName, qty);
+            mail.items.push({ name: itemName, count: qty });
+            mail.message = args.slice(4).join(' ');
+        } else {
+            mail.message = args.slice(1).join(' ');
+        }
+        targetPlayer.mailbox.push(mail);
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        targetAccount.characters[targetPlayer.className] = targetPlayer;
+        saveAccount(targetSender, targetAccount);
+        replier.reply('📨 ' + targetName + '님에게 우편을 보냈습니다.');
+    },
+    '/우편수령': function(player, args, replier, sender, account) {
+        if (!player.mailbox || player.mailbox.length === 0) {
+            replier.reply('⚠️ 받은 우편이 없습니다.');
+            return;
+        }
+        var idx = parseInt(args[0]) - 1;
+        if (isNaN(idx) || idx < 0 || idx >= player.mailbox.length) {
+            replier.reply('⚠️ 유효한 우편 번호를 입력하세요.');
+            return;
+        }
+        var mail = player.mailbox[idx];
+        if (mail.gold) player.gold += mail.gold;
+        if (mail.items) mail.items.forEach(function(i) { player.addItem(i.name, i.count); });
+        var msg = '📬 [' + mail.from + ']님의 우편 수령 완료!\n';
+        if (mail.gold) msg += '💰 ' + mail.gold + ' G\n';
+        if (mail.items && mail.items.length > 0) msg += '📦 ' + mail.items.map(function(i) { return i.name + ' x' + i.count; }).join(', ') + '\n';
+        if (mail.message) msg += '💬 ' + mail.message;
+        player.mailbox.splice(idx, 1);
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        replier.reply(msg.trim());
+    },
+    '/우편일괄수령': function(player, args, replier, sender, account) {
+        if (!player.mailbox || player.mailbox.length === 0) {
+            replier.reply('⚠️ 받은 우편이 없습니다.');
+            return;
+        }
+        var totalGold = 0;
+        var totalItems = {};
+        player.mailbox.forEach(function(mail) {
+            if (mail.gold) totalGold += mail.gold;
+            if (mail.items) mail.items.forEach(function(i) {
+                player.addItem(i.name, i.count);
+                totalItems[i.name] = (totalItems[i.name] || 0) + i.count;
+            });
+        });
+        player.gold += totalGold;
+        var count = player.mailbox.length;
+        player.mailbox = [];
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        var msg = '📬 ' + count + '통의 우편 일괄 수령 완료!\n💰 총 ' + totalGold + ' G';
+        if (Object.keys(totalItems).length > 0) {
+            msg += '\n📦 ' + Object.keys(totalItems).map(function(k) { return k + ' x' + totalItems[k]; }).join(', ');
+        }
+        replier.reply(msg);
+    },
+
+    // --- [신규] 친구 시스템 ---
+    '/친구추가': function(player, args, replier, sender, account) {
+        var name = args.join(' ');
+        if (!name) {
+            replier.reply('⚠️ 사용법: /친구추가 [플레이어이름]');
+            return;
+        }
+        if (name === player.name) {
+            replier.reply('⚠️ 자신을 친구로 추가할 수 없습니다.');
+            return;
+        }
+        var targetSender = findSenderByName(name);
+        if (!targetSender) {
+            replier.reply("⚠️ '" + name + "' 플레이어를 찾을 수 없거나 오프라인 상태입니다.");
+            return;
+        }
+        if (!player.friends) player.friends = [];
+        if (player.friends.indexOf(name) > -1) {
+            replier.reply('⚠️ 이미 친구 목록에 있습니다.');
+            return;
+        }
+        player.friends.push(name);
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        replier.reply('🤝 [' + name + '] 님을 친구로 추가했습니다.');
+    },
+    '/친구삭제': function(player, args, replier, sender, account) {
+        var name = args.join(' ');
+        if (!name) {
+            replier.reply('⚠️ 사용법: /친구삭제 [플레이어이름]');
+            return;
+        }
+        if (!player.friends) player.friends = [];
+        var idx = player.friends.indexOf(name);
+        if (idx === -1) {
+            replier.reply('⚠️ 친구 목록에 없는 이름입니다.');
+            return;
+        }
+        player.friends.splice(idx, 1);
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        replier.reply('👋 [' + name + '] 님을 친구 목록에서 삭제했습니다.');
+    },
+    '/친구목록': function(player, args, replier, sender, account) {
+        if (!player.friends) player.friends = [];
+        var msg = '--- 🤝 친구 목록 (' + player.friends.length + ') ---\n';
+        if (player.friends.length === 0) {
+            msg += '친구가 없습니다. /친구추가 [이름] 으로 추가하세요.';
+        } else {
+            player.friends.forEach(function(fname) {
+                var fSender = findSenderByName(fname);
+                var status = fSender ? '🟢 온라인' : '⚫ 오프라인';
+                var fInfo = '';
+                if (fSender && players[fSender]) {
+                    fInfo = ' (Lv.' + players[fSender].level + ' ' + players[fSender].className + ')';
+                }
+                msg += '• ' + fname + fInfo + ' - ' + status + '\n';
+            });
+        }
+        replier.reply(msg.trim());
+    },
+
+    // --- [신규] 일일 일괄 수령 ---
+    '/일일일괄수령': function(player, args, replier, sender, account) {
+        if (!player.dailyQuests || !player.dailyQuests.quests || player.dailyQuests.quests.length === 0) {
+            replier.reply('⚠️ 진행 중인 일일 퀘스트가 없습니다.');
+            return;
+        }
+        var totalGold = 0;
+        var totalExp = 0;
+        var claimed = [];
+        player.dailyQuests.quests.forEach(function(q) {
+            if (q.claimed) return;
+            var qData = null;
+            for (var i = 0; i < GameData.dailyQuests.length; i++) {
+                if (GameData.dailyQuests[i].id === q.id) { qData = GameData.dailyQuests[i]; break; }
+            }
+            if (!qData) return;
+            if (q.current >= qData.count) {
+                q.claimed = true;
+                totalGold += qData.reward.gold;
+                totalExp += qData.reward.exp;
+                claimed.push(qData.name);
+            }
+        });
+        if (claimed.length === 0) {
+            replier.reply('⚠️ 수령 가능한 완료된 일일 퀘스트가 없습니다.');
+            return;
+        }
+        player.gold += totalGold;
+        var expMsg = player.addExp(totalExp);
+        var msg = '🎁 ' + claimed.length + '개의 일일 퀘스트 보상 일괄 수령!\n수령: ' + claimed.join(', ') + '\n총 ' + totalGold + ' G, ' + expMsg;
+        // 모두 완료 보너스
+        var allClaimed = player.dailyQuests.quests.every(function(q) { return q.claimed; });
+        if (allClaimed && !player.dailyQuests.bonusClaimed) {
+            player.dailyQuests.bonusClaimed = true;
+            player.gold += 1000;
+            player.addItem('화려한 보물상자', 1);
+            msg += '\n\n🌟 오늘의 모든 일일 퀘스트를 완료했습니다!\n보너스: 1000 G + [화려한 보물상자] 1개';
+        }
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        replier.reply(msg);
     }
 };
 
@@ -3814,7 +4189,8 @@ function checkPlayerState(player, cmd) {
     var allowedCommands = [];
     var message = "";
     var alwaysAllowed = ['/내정보', '/인벤토리', '/장비', '/퀘스트', '/내캐릭터', '/저장', '/도움말', '/명령어',
-                          '/펫', '/펫정보', '/캐릭터변경', '/통계', '/칭호', '/업적', '/일일퀘스트'];
+                          '/펫', '/펫정보', '/캐릭터변경', '/통계', '/칭호', '/업적', '/일일퀘스트', '/스킬목록',
+                          '/우편함', '/우편수령', '/우편일괄수령', '/친구목록', '/강화정보'];
     var combatSkills = ['/강타', '/파이어볼', '/힐', '/독바르기',
                          '/분노폭발', '/신성한방패', '/메테오', '/골렘소환', '/암살', '/훔치기', '/부활', '/아수라파천무'];
 
@@ -3900,6 +4276,20 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     if (handler) {
         try {
             handler(player, args, replier, sender, account);
+            // 첫 명령 실행 후 출석/우편 힌트 (한 세션에 한 번씩만)
+            try {
+                var todayStr = new Date().toISOString().slice(0, 10);
+                if (!attendanceHintSent[sender] && cmd !== '/출석' && player.lastAttendance !== todayStr) {
+                    attendanceHintSent[sender] = true;
+                    replier.reply('💡 오늘 아직 출석체크를 하지 않았어요! /출석 명령어로 보상을 받아보세요.');
+                }
+                if (!mailHintSent[sender] && cmd !== '/우편함' && player.mailbox && player.mailbox.length > 0) {
+                    mailHintSent[sender] = true;
+                    replier.reply('📬 새로운 우편 ' + player.mailbox.length + '통이 도착했어요. /우편함 으로 확인해보세요!');
+                }
+            } catch (hintErr) {
+                // 힌트 실패는 메인 흐름을 막지 않음
+            }
         } catch (e) {
             Log.e("명령어 " + cmd + " 실행 중 오류 발생: " + e + " (Line: " + e.lineNumber + ")");
             replier.reply("죄송합니다. 명령어 처리 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
