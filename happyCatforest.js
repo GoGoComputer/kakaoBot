@@ -1,7 +1,16 @@
 /**
- * 묘냥의 숲 RPG 게임 스크립트 v3.6.0 - 콘텐츠 대확장
+ * 묘냥의 숲 RPG 게임 스크립트 v3.6.1 - 검증/보강 패치
  * * 제작: momo
  * * 수정: Gemini, 묘냥, Claude
+ * * 주요 변경사항 (v3.6.1):
+ * - [버그수정] 조합 재료 수급 불가 문제 해결: 9종의 신규 몬스터 추가
+ *   (쥐/멧돼지/오크/나무정령/보석거미/트롤/오우거/화염정령/어린 용)
+ * - [버그수정] 칭호 보너스(att/def)가 전투에 실제 적용되지 않던 문제 수정.
+ * - [기능] /파티거절 명령어 추가.
+ * - [기능] /스킬목록 명령어 추가 - 현재 직업의 스킬 정보 표시.
+ * - [기능] 일일 퀘스트 3개 모두 완료 시 보너스 (1000G + 화려한 보물상자).
+ * - [개선] /인벤토리 출력 카테고리화: 무기/방어구/방패/소비/상자/특수/재료별 구분.
+ * - [개선] 어류 보관함 표시 상위 20마리만 노출, 초과시 요약.
  * * 주요 변경사항 (v3.6.0):
  * - [기능] 2차 직업 전 직업의 고유 스킬 명령어 구현 (/분노폭발, /신성한방패, /메테오, /골렘소환, /암살, /훔치기, /부활, /아수라파천무).
  * - [기능] 튜토리얼 시스템 추가 (/튜토리얼, /튜토리얼다음, /튜토리얼완료, /튜토리얼재시작).
@@ -54,9 +63,18 @@ var Config = {
 // -------------------------------------------
 var GameData = {
     monsters: {
+        '쥐': { name: '쥐', hp: 15, att: 5, def: 1, exp: 5, gold: 3, items: ['쥐꼬리'] },
         '슬라임': { name: '슬라임', hp: 30, att: 8, def: 2, exp: 10, gold: 5, items: ['젤리', '펫 알'] },
+        '멧돼지': { name: '멧돼지', hp: 50, att: 15, def: 4, exp: 18, gold: 12, items: ['멧돼지 어금니', '가죽 조각'] },
         '고블린': { name: '고블린', hp: 70, att: 18, def: 6, exp: 25, gold: 20, items: ['가죽 조각', '단검'] },
+        '오크': { name: '오크', hp: 100, att: 22, def: 8, exp: 35, gold: 30, items: ['오크의 송곳니', '구리 조각', '가죽 조각'] },
         '늑대': { name: '늑대', hp: 90, att: 22, def: 8, exp: 35, gold: 25, items: ['늑대 가죽', '펫 알'] },
+        '나무정령': { name: '나무정령', hp: 150, att: 25, def: 12, exp: 60, gold: 50, items: ['생명의 나뭇가지', '구리 조각'] },
+        '보석거미': { name: '보석거미', hp: 180, att: 30, def: 10, exp: 80, gold: 70, items: ['보석', '구리 조각'] },
+        '트롤': { name: '트롤', hp: 250, att: 40, def: 18, exp: 120, gold: 100, items: ['트롤의 피', '지옥의 가죽'] },
+        '오우거': { name: '오우거', hp: 350, att: 55, def: 25, exp: 180, gold: 150, items: ['오우거의 가죽', '강철 몽둥이', '지옥의 가죽'] },
+        '화염정령': { name: '화염정령', hp: 400, att: 60, def: 20, exp: 220, gold: 180, items: ['불의 정수', '타오르는 심장'] },
+        '어린 용': { name: '어린 용', hp: 500, att: 65, def: 35, exp: 280, gold: 230, items: ['용의 비늘', '타오르는 심장', '펫 알'] },
         '골렘': { name: '골렘', hp: 600, att: 70, def: 60, exp: 300, gold: 250, items: ['마력의 돌', '골렘의 핵'] },
         '심연의 감시자': { name: '심연의 감시자', hp: 3000, att: 200, def: 100, exp: 1000, gold: 1000, items: ['심연의 파편', '찬란한 보물상자'] },
         '혼돈의 그림자': { name: '혼돈의 그림자', hp: 5000, att: 250, def: 120, exp: 2000, gold: 2000, items: ['혼돈의 정수', '찬란한 보물상자'] },
@@ -497,6 +515,11 @@ Player.prototype = {
             }
         }
 
+        // [추가] 칭호 보너스 적용
+        if (this.title && GameData.titles[this.title] && GameData.titles[this.title].bonus) {
+            totalAtt += GameData.titles[this.title].bonus.att || 0;
+        }
+
         return totalAtt;
     },
     getDefense: function() {
@@ -529,6 +552,11 @@ Player.prototype = {
             if (bonuses[String(count)] && bonuses[String(count)].defMultiplier) {
                 totalDef = Math.floor(totalDef * bonuses[String(count)].defMultiplier);
             }
+        }
+
+        // [추가] 칭호 보너스 적용
+        if (this.title && GameData.titles[this.title] && GameData.titles[this.title].bonus) {
+            totalDef += GameData.titles[this.title].bonus.def || 0;
         }
 
         return totalDef;
@@ -831,7 +859,7 @@ function refreshDailyQuests(player) {
         var q = pool.splice(idx, 1)[0];
         picked.push({ id: q.id, current: 0, claimed: false });
     }
-    player.dailyQuests = { date: todayStr, quests: picked };
+    player.dailyQuests = { date: todayStr, quests: picked, bonusClaimed: false };
     return true;
 }
 
@@ -1352,27 +1380,54 @@ function endTrade(sessionId, replier, message) {
 }
 
 function showInventory(player) {
-    var msg = '--- 인벤토리 (' + player.name + ') ---\n';
+    var msg = '--- 🎒 인벤토리 (' + player.name + ') ---\n';
     if (player.inventory.length === 0) {
-        msg += '🎒 아이템이 없습니다.\n';
+        msg += '아이템이 없습니다.\n';
     } else {
+        var groups = { weapon: [], armor: [], shield: [], consumable: [], material: [], box: [], special: [], other: [] };
+        var typeNames = {
+            weapon: '⚔️ 무기',
+            armor: '🛡️ 방어구',
+            shield: '🪧 방패',
+            consumable: '🧪 소비',
+            material: '🔩 재료',
+            box: '🎁 상자',
+            special: '✨ 특수',
+            other: '❓ 기타'
+        };
         player.inventory.forEach(function(item) {
             var itemInfo = GameData.items[item.name];
-            msg += '• ' + item.name + ' x' + item.count + (itemInfo && itemInfo.description ? ' (' + itemInfo.description + ')\n' : '\n');
+            var t = (itemInfo && itemInfo.type) || 'other';
+            if (!groups[t]) t = 'other';
+            groups[t].push({ item: item, info: itemInfo });
+        });
+        ['weapon', 'armor', 'shield', 'consumable', 'box', 'special', 'material', 'other'].forEach(function(t) {
+            if (groups[t].length === 0) return;
+            msg += '\n[' + typeNames[t] + ']\n';
+            groups[t].forEach(function(entry) {
+                var item = entry.item;
+                var info = entry.info;
+                msg += '• ' + item.name + ' x' + item.count;
+                if (info && info.description) msg += ' - ' + info.description;
+                msg += '\n';
+            });
         });
     }
-    msg += '\n--- 어류 보관함 ---\n';
+    msg += '\n--- 🐟 어류 보관함 ---\n';
     if (player.fishInventory.length === 0) {
-        msg += '🐟 잡은 물고기가 없습니다.\n';
+        msg += '잡은 물고기가 없습니다.\n';
     } else {
         var sortedFish = player.fishInventory.sort(function(a, b) {
             return b.size - a.size;
         });
-        sortedFish.forEach(function(fish) {
+        sortedFish.slice(0, 20).forEach(function(fish) {
             msg += '• ' + fish.name + ' (' + fish.size + 'cm)\n';
         });
+        if (sortedFish.length > 20) {
+            msg += '...외 ' + (sortedFish.length - 20) + '마리\n';
+        }
     }
-    msg += '----------------\n' + '골드: ' + player.gold + ' G';
+    msg += '\n💰 골드: ' + player.gold + ' G';
     return msg;
 }
 
@@ -1457,8 +1512,8 @@ var commandHandlers = {
         replier.reply('🎉 캐릭터 "' + name + '" (' + className + ') 생성 완료! 🎉\n\n💡 처음이라면 /튜토리얼 명령어로 게임을 차근차근 배워보세요!\n💡 모든 명령어는 /명령어 로 확인할 수 있습니다.\n💡 매일 /출석 명령어를 입력해 보상을 받아가세요!');
     },
     '/명령어': function(player, args, replier, sender, account) {
-        replier.reply('--- 묘냥의 숲 명령어 v3.6.0 ---\n' +
-            '👤 플레이어: /내정보, /인벤토리, /장비, /퀘스트, /랭킹, /내캐릭터, /통계, /칭호\n' +
+        replier.reply('--- 묘냥의 숲 명령어 v3.6.1 ---\n' +
+            '👤 플레이어: /내정보, /인벤토리, /장비, /퀘스트, /랭킹, /내캐릭터, /통계, /칭호, /스킬목록\n' +
             '📖 신규: /튜토리얼, /출석, /일일퀘스트, /일일보상, /업적\n' +
             '🐾 펫: /펫, /펫정보, /펫알부화, /펫먹이주기, /펫동행, /펫이름변경, /펫진화\n' +
             '✨ 성장: /캐릭터변경, /전직\n' +
@@ -1469,7 +1524,7 @@ var commandHandlers = {
             '💰 거래: /판매, /아이템일괄판매, /물고기일괄판매, /송금\n' +
             '🛠️ 제작: /조합법, /조합, /요리법, /요리\n' +
             '🎁 뽑기: /상자열기, /상자일괄열기\n' +
-            '👨‍👩‍👧‍👦 파티: /파티생성, /파티초대, /파티수락, /파티탈퇴, /파티해산, /파티정보, /파티챗\n' +
+            '👨‍👩‍👧‍👦 파티: /파티생성, /파티초대, /파티수락, /파티거절, /파티탈퇴, /파티해산, /파티정보, /파티챗\n' +
             '👹 레이드: /어비스입장, /어비스공격, /어비스포기\n' +
             '🤝 1:1 거래: /거래신청, /거래수락, /거래거절, /거래취소, /거래올리기, /거래골드, /거래확인\n' +
             '🎣 경제: /낚시, /수산시장, /시장등록, /시장구매\n' +
@@ -2142,6 +2197,16 @@ var commandHandlers = {
         account.characters[player.className] = player;
         saveAccount(sender, account);
         replier.reply("✅ " + players[inviterSender].name + "님의 파티에 참가했습니다.");
+    },
+    '/파티거절': function(player, args, replier, sender, account) {
+        var inviterSender = invitations[sender];
+        if (!inviterSender) {
+            replier.reply("⚠️ 받은 파티 초대가 없습니다.");
+            return;
+        }
+        var inviterName = players[inviterSender] ? players[inviterSender].name : '(알수없음)';
+        delete invitations[sender];
+        replier.reply("✋ " + inviterName + "님의 파티 초대를 거절했습니다.");
     },
     '/파티탈퇴': function(player, args, replier, sender, account) {
         if (!player.party) {
@@ -3185,6 +3250,31 @@ var commandHandlers = {
     },
 
 
+    '/스킬목록': function(player, args, replier, sender, account) {
+        var classInfo = GameData.classes[player.className];
+        if (!classInfo || !classInfo.skills) {
+            replier.reply("⚠️ 현재 직업의 스킬 정보를 찾을 수 없습니다.");
+            return;
+        }
+        var msg = '--- ✨ ' + player.name + ' (' + player.className + ') 스킬 목록 ---\n';
+        var skillKeys = Object.keys(classInfo.skills);
+        if (skillKeys.length === 0) {
+            msg += '사용 가능한 스킬이 없습니다.';
+        } else {
+            skillKeys.forEach(function(skillName) {
+                var s = classInfo.skills[skillName];
+                msg += '• [' + skillName + '] (MP ' + s.mpCost + ')\n';
+                msg += '   ' + (s.description || '설명 없음') + '\n';
+            });
+            msg += '\n💡 명령어: /' + skillKeys[0].replace(/ /g, '');
+            if (skillKeys.length > 1) msg += ' 등';
+        }
+        if (player.jobTier === 1) {
+            msg += '\n\n👀 50레벨 달성 + 영웅의 길 퀘스트 완료 시 /전직 가능!';
+        }
+        replier.reply(msg);
+    },
+
     // --- 펫 시스템 명령어 ---
     '/펫': function(player, args, replier, sender, account) {
         replier.reply(
@@ -3486,9 +3576,18 @@ var commandHandlers = {
         targetQ.claimed = true;
         player.gold += targetQData.reward.gold;
         var expMsg = player.addExp(targetQData.reward.exp);
+        var resultMsg = '🎁 [' + targetQData.name + '] 일일 퀘스트 보상 수령!\n' + targetQData.reward.gold + ' G, ' + expMsg;
+        // 모든 일일 퀘스트 완료 보너스
+        var allClaimed = player.dailyQuests.quests.every(function(q) { return q.claimed; });
+        if (allClaimed && !player.dailyQuests.bonusClaimed) {
+            player.dailyQuests.bonusClaimed = true;
+            player.gold += 1000;
+            player.addItem('화려한 보물상자', 1);
+            resultMsg += '\n\n🌟 오늘의 모든 일일 퀘스트를 완료했습니다!\n보너스: 1000 G + [화려한 보물상자] 1개';
+        }
         account.characters[player.className] = player;
         saveAccount(sender, account);
-        replier.reply('🎁 [' + targetQData.name + '] 일일 퀘스트 보상 수령!\n' + targetQData.reward.gold + ' G, ' + expMsg);
+        replier.reply(resultMsg);
     },
 
     // --- [신규] 업적 시스템 ---
