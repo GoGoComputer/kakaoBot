@@ -1,7 +1,19 @@
 /**
- * 묘냥의 숲 RPG 게임 스크립트 v3.8.0 - 사회적 콘텐츠 대확장 + 명령어 프리픽스 변경
+ * 묘냥의 숲 RPG 게임 스크립트 v3.9.0 - 콘텐츠 확장 + UX 개선
  * * 제작: momo
  * * 수정: Gemini, 묘냥, Claude
+ * * 주요 변경사항 (v3.9.0):
+ * - [기능] .이름변경 [새이름]: 캐릭터 이름 변경 (5000G, 중복 체크)
+ * - [기능] .버프: 현재 적용 중인 버프/펫/칭호/세트 효과 통합 표시
+ * - [기능] .우편삭제 [번호/전체]: 우편 보상 미수령 삭제
+ * - [기능] .지도: 레벨대별 사냥터 가이드 (HP 범위 기준 자동 분류)
+ * - [기능] .랭킹 [레벨/골드/낚시/PvP/길드/업적]: 카테고리별 랭킹
+ * - [개선] .사용 [아이템] [수량]: 일괄 사용 지원 (포션 5개 한번에 등)
+ * - [개선] .캐릭터변경: 파티 소속 시 차단
+ * - [콘텐츠] 신규 퀘스트 5개 (쥐 박멸/오크 위협/거미 사냥/용 비늘/심연 정복)
+ * - [콘텐츠] 신규 조합법 5개 (마나 포션/엘릭서/강화석/축복의 가루/어둠의 검)
+ * - [콘텐츠] 신규 요리법 3개 (연어 스테이크/문어 숙회/상어지느러미찜)
+ * - [콘텐츠] 신규 요리 아이템 3종 (버프 효과 포함)
  * * 주요 변경사항 (v3.8.0):
  * - [중대변경] 모든 명령어 프리픽스 / → . 으로 변경 (카카오톡 봇 친화적)
  *   예: /내정보 → .내정보, /사냥 → .사냥
@@ -151,7 +163,11 @@ var GameData = {
         '잉어찜': { name: '잉어찜', type: 'consumable', description: 'HP 40 회복', effect: function(p) { p.hp = Math.min(p.getMaxHp(), p.hp + 40); return 'HP를 40 회복했습니다.'; } },
         '광어회': { name: '광어회', type: 'consumable', description: 'HP 120 회복', effect: function(p) { p.hp = Math.min(p.getMaxHp(), p.hp + 120); return 'HP를 120 회복했습니다.'; } },
         '장어구이': { name: '장어구이', type: 'consumable', description: 'HP 200, MP 50 회복', effect: function(p) { p.hp = Math.min(p.getMaxHp(), p.hp + 200); p.mp = Math.min(p.getMaxMp(), p.mp + 50); return 'HP를 200, MP를 50 회복했습니다.'; } },
-        '고래찜': { name: '고래찜', type: 'consumable', description: 'HP/MP 모두 회복', effect: function(p) { p.hp = p.getMaxHp(); p.mp = p.getMaxMp(); return 'HP와 MP를 모두 회복했습니다.'; } }
+        '고래찜': { name: '고래찜', type: 'consumable', description: 'HP/MP 모두 회복', effect: function(p) { p.hp = p.getMaxHp(); p.mp = p.getMaxMp(); return 'HP와 MP를 모두 회복했습니다.'; } },
+        // [추가 v3.9.0] 신규 요리 아이템 3종
+        '연어 스테이크': { name: '연어 스테이크', type: 'consumable', description: 'HP 80, MP 30 회복', effect: function(p) { p.hp = Math.min(p.getMaxHp(), p.hp + 80); p.mp = Math.min(p.getMaxMp(), p.mp + 30); return 'HP를 80, MP를 30 회복했습니다.'; } },
+        '문어 숙회': { name: '문어 숙회', type: 'consumable', description: 'HP 150 회복 + 5분간 공격력 10% 증가', effect: function(p) { p.hp = Math.min(p.getMaxHp(), p.hp + 150); p.buffs.att = { multiplier: 1.1, expires: Date.now() + 300000 }; return 'HP를 150 회복하고, 5분간 공격력 10% 증가!'; } },
+        '상어지느러미찜': { name: '상어지느러미찜', type: 'consumable', description: 'HP/MP 80% 회복 + 5분간 방어력 15% 증가', effect: function(p) { p.hp = Math.min(p.getMaxHp(), p.hp + Math.floor(p.getMaxHp() * 0.8)); p.mp = Math.min(p.getMaxMp(), p.mp + Math.floor(p.getMaxMp() * 0.8)); p.buffs.def = { multiplier: 1.15, expires: Date.now() + 300000 }; return 'HP/MP를 80% 회복하고, 5분간 방어력 15% 증가!'; } }
     },
     pets: {
         '아기용': {
@@ -220,7 +236,13 @@ var GameData = {
         '늑대 사냥꾼': { name: '늑대 사냥꾼', description: '숲의 늑대 10마리를 처치하세요.', target: '늑대', count: 10, reward: { exp: 500, gold: 300, items: ['강철 몽둥이'] } },
         '골렘 파괴': { name: '골렘 파괴', description: '산악 지대의 골렘을 파괴하고 핵을 가져오세요.', target: '골렘', count: 1, reward: { exp: 2000, gold: 1500, items: ['어둠의 검'] } },
         // [추가] 전직 퀘스트
-        '영웅의 길': { name: '영웅의 길', description: '자신의 한계를 증명하기 위해 어비스 드래곤을 1번 처치하세요.', target: '어비스 드래곤', count: 1, reward: { exp: 10000, gold: 5000, items: ['영웅의 증표'] } }
+        '영웅의 길': { name: '영웅의 길', description: '자신의 한계를 증명하기 위해 어비스 드래곤을 1번 처치하세요.', target: '어비스 드래곤', count: 1, reward: { exp: 10000, gold: 5000, items: ['영웅의 증표'] } },
+        // [추가 v3.9.0] 신규 퀘스트
+        '쥐 박멸': { name: '쥐 박멸', description: '쥐 30마리를 처치하여 마을 위협을 제거하세요.', target: '쥐', count: 30, reward: { exp: 300, gold: 200, items: ['포션', '포션', '포션'] } },
+        '오크의 위협': { name: '오크의 위협', description: '오크 20마리를 처치하여 야영지를 정리하세요.', target: '오크', count: 20, reward: { exp: 1500, gold: 1000, items: ['강철검'] } },
+        '거미 사냥': { name: '거미 사냥', description: '보석거미 15마리를 처치하여 보석을 회수하세요.', target: '보석거미', count: 15, reward: { exp: 2500, gold: 2000, items: ['보석', '보석', '보석'] } },
+        '용의 비늘 모으기': { name: '용의 비늘 모으기', description: '어린 용 5마리를 처치하여 비늘을 모으세요.', target: '어린 용', count: 5, reward: { exp: 5000, gold: 3500, items: ['용의 비늘', '용의 비늘'] } },
+        '심연 정복자': { name: '심연 정복자', description: '심연의 감시자 3마리를 처치하여 명성을 얻으세요.', target: '심연의 감시자', count: 3, reward: { exp: 8000, gold: 6000, items: ['찬란한 보물상자', '강화석', '강화석', '강화석'] } }
     },
     classes: {
         // --- 1차 직업 ---
@@ -388,14 +410,24 @@ var GameData = {
         '룬 블레이드': { cost: 3000, materials: [{ name: '어둠의 검', count: 1 }, { name: '마력의 돌', count: 5 }, { name: '심연의 파편', count: 1 }], result: { name: '룬 블레이드', count: 1 } },
         '힘의 영약': { cost: 1000, materials: [{ name: '트롤의 피', count: 2 }, { name: '오우거의 가죽', count: 1 }, { name: '불의 정수', count: 1 }], result: { name: '힘의 영약', count: 1 } },
         '수호의 영약': { cost: 1000, materials: [{ name: '골렘의 핵', count: 1 }, { name: '용의 비늘', count: 2 }, { name: '지옥의 가죽', count: 1 }], result: { name: '수호의 영약', count: 1 } },
-        '성장의 영약': { cost: 10000, materials: [{ name: '혼돈의 정수', count: 1 }, { name: '드래곤의 심장', count: 1 }, { name: '찬란한 보물상자', count: 1 }], result: { name: '성장의 영약', count: 1 } }
+        '성장의 영약': { cost: 10000, materials: [{ name: '혼돈의 정수', count: 1 }, { name: '드래곤의 심장', count: 1 }, { name: '찬란한 보물상자', count: 1 }], result: { name: '성장의 영약', count: 1 } },
+        // [추가 v3.9.0] 신규 조합법 5종
+        '마나 포션': { cost: 100, materials: [{ name: '젤리', count: 8 }, { name: '구리 조각', count: 2 }], result: { name: '마나 포션', count: 2 } },
+        '엘릭서': { cost: 500, materials: [{ name: '포션', count: 5 }, { name: '마나 포션', count: 5 }, { name: '보석', count: 1 }], result: { name: '엘릭서', count: 1 } },
+        '강화석': { cost: 200, materials: [{ name: '구리 조각', count: 10 }, { name: '마력의 돌', count: 1 }], result: { name: '강화석', count: 1 } },
+        '축복의 가루': { cost: 800, materials: [{ name: '강화석', count: 3 }, { name: '보석', count: 1 }, { name: '불의 정수', count: 1 }], result: { name: '축복의 가루', count: 1 } },
+        '어둠의 검': { cost: 2000, materials: [{ name: '강철 몽둥이', count: 1 }, { name: '오크의 송곳니', count: 5 }, { name: '지옥의 가죽', count: 2 }], result: { name: '어둠의 검', count: 1 } }
     },
     cookingRecipes: {
         '멸치구이': { cost: 10, fish: { name: '멸치', count: 1 }, result: { name: '멸치구이', count: 1 } },
         '잉어찜': { cost: 30, fish: { name: '잉어', count: 1 }, result: { name: '잉어찜', count: 1 } },
         '광어회': { cost: 100, fish: { name: '광어', count: 1 }, result: { name: '광어회', count: 1 } },
         '장어구이': { cost: 200, fish: { name: '장어', count: 1 }, result: { name: '장어구이', count: 1 } },
-        '고래찜': { cost: 1000, fish: { name: '고래', count: 1 }, result: { name: '고래찜', count: 1 } }
+        '고래찜': { cost: 1000, fish: { name: '고래', count: 1 }, result: { name: '고래찜', count: 1 } },
+        // [추가 v3.9.0] 신규 요리법 3종
+        '연어 스테이크': { cost: 150, fish: { name: '연어', count: 1 }, result: { name: '연어 스테이크', count: 1 } },
+        '문어 숙회': { cost: 250, fish: { name: '문어', count: 1 }, result: { name: '문어 숙회', count: 1 } },
+        '상어지느러미찜': { cost: 800, fish: { name: '상어', count: 1 }, result: { name: '상어지느러미찜', count: 1 } }
     },
     treasureBoxes: {
         '낡은 보물상자': [
@@ -1590,11 +1622,11 @@ var commandHandlers = {
         replier.reply('🎉 캐릭터 "' + name + '" (' + className + ') 생성 완료! 🎉\n\n💡 처음이라면 .튜토리얼 명령어로 게임을 차근차근 배워보세요!\n💡 모든 명령어는 .명령어 로 확인할 수 있습니다.\n💡 매일 .출석 명령어를 입력해 보상을 받아가세요!');
     },
     '.명령어': function(player, args, replier, sender, account) {
-        replier.reply('--- 묘냥의 숲 명령어 v3.8.0 ---\n' +
-            '👤 플레이어: .내정보, .인벤토리, .장비, .퀘스트, .랭킹, .내캐릭터, .통계, .칭호, .스킬목록\n' +
+        replier.reply('--- 묘냥의 숲 명령어 v3.9.0 ---\n' +
+            '👤 플레이어: .내정보, .인벤토리, .장비, .퀘스트, .랭킹, .내캐릭터, .통계, .칭호, .스킬목록, .버프\n' +
             '📖 데일리: .튜토리얼, .출석, .일일퀘스트, .일일보상, .일일일괄수령, .업적\n' +
             '🐾 펫: .펫, .펫정보, .펫알부화, .펫먹이주기, .펫동행, .펫이름변경, .펫진화\n' +
-            '✨ 성장: .캐릭터변경, .전직, .강화, .강화정보\n' +
+            '✨ 성장: .캐릭터변경, .이름변경, .전직, .강화, .강화정보\n' +
             '⚔️ 행동: .사냥, .상점, .구매, .취침, .장착, .해제, .사용, .수리, .나가기\n' +
             '🔥 PvP: .전쟁모드, .pk [이름], .pvp랭킹, .pvp전적\n' +
             '✨ 1차 스킬: .힐, .강타, .파이어볼, .독바르기\n' +
@@ -1602,7 +1634,7 @@ var commandHandlers = {
             '⚔️ 전투: .공격, .도망\n' +
             '📜 퀘스트: .수락 [퀘스트], .완료 [퀘스트]\n' +
             '💰 거래: .판매, .아이템일괄판매, .물고기일괄판매, .송금\n' +
-            '📬 우편: .우편함, .우편보내기, .우편수령, .우편일괄수령\n' +
+            '📬 우편: .우편함, .우편보내기, .우편수령, .우편일괄수령, .우편삭제\n' +
             '🤝 친구: .친구추가, .친구삭제, .친구목록\n' +
             '🏰 길드: .길드창설, .길드신청, .길드초대, .길드초대수락/거절, .길드수락/거절, .길드정보, .길드원, .길드기부, .길드공지, .길드채팅, .길드추방, .길드위임, .길드탈퇴, .길드해산, .길드목록\n' +
             '🛠️ 제작: .조합법, .조합, .요리법, .요리\n' +
@@ -1612,16 +1644,19 @@ var commandHandlers = {
             '🤝 1:1 거래: .거래신청, .거래수락, .거래거절, .거래취소, .거래올리기, .거래골드, .거래확인\n' +
             '🎣 경제: .낚시, .낚시중지, .수산시장, .시장등록, .시장취소, .시장구매\n' +
             '🎲 로또: .로또, .로또구매, .로또확인, .로또추첨\n' +
-            '📚 정보: .도움말, .도감, .몬스터도감, .아이템도감, .저장');
+            '📚 정보: .도움말, .도감, .지도, .몬스터도감, .아이템도감, .저장\n' +
+            '💡 .랭킹 [레벨/골드/낚시/PvP/길드/업적] 으로 카테고리 랭킹 확인');
     },
     '.도움말': function(player, args, replier, sender, account) {
         replier.reply(
-            '--- 묘냥의 숲 상세 도움말 v3.8.0 ---\n\n' +
+            '--- 묘냥의 숲 상세 도움말 v3.9.0 ---\n\n' +
             '📖 __기본 & 캐릭터__\n' +
             ' • .생성 [이름] [직업]: 새 1차 직업 캐릭터 생성\n' +
-            ' • .내정보, .인벤토리, .장비, .저장, .랭킹, .통계, .칭호\n' +
+            ' • .내정보, .인벤토리, .장비, .저장, .통계, .칭호, .버프\n' +
             ' • .내캐릭터: 보유한 모든 캐릭터 목록 보기\n' +
-            ' • .캐릭터변경 [직업]: 다른 캐릭터로 접속\n\n' +
+            ' • .캐릭터변경 [직업]: 다른 캐릭터로 접속\n' +
+            ' • .이름변경 [새이름]: 캐릭터 이름 변경 (5000G)\n' +
+            ' • .랭킹 [레벨/골드/낚시/PvP/길드/업적]: 카테고리별 랭킹\n\n' +
             '🆕 __데일리 콘텐츠__\n' +
             ' • .튜토리얼: 단계별 게임 안내 (신규 유저 추천)\n' +
             ' • .출석: 일일 출석체크 - 연속 출석 시 보상↑\n' +
@@ -1663,7 +1698,9 @@ var commandHandlers = {
             ' • .거래신청 [이름]: 1:1 아이템/골드 거래\n' +
             ' • .송금 [이름] [금액]: 골드 송금 (5% 수수료)\n\n' +
             '⚔️ __전투 & PvP__\n' +
-            ' • .사냥 [몬스터], .공격, .도망, .사용 [아이템]\n' +
+            ' • .사냥 [몬스터], .공격, .도망\n' +
+            ' • .사용 [아이템] [수량]: 단일 또는 일괄 사용\n' +
+            ' • .지도: 레벨대별 사냥 가이드\n' +
             ' • .수락/완료 [퀘스트]\n' +
             ' • .전쟁모드: PvP ON/OFF (경험치 +3%)\n' +
             ' • .pk [이름] / .pvp랭킹 / .pvp전적\n' +
@@ -1681,6 +1718,7 @@ var commandHandlers = {
             ' • .우편함, .우편보내기 [이름] [내용]\n' +
             ' • .우편보내기 [이름] 골드 [금액] [메시지]\n' +
             ' • .우편보내기 [이름] 아이템 [이름] [수량] [메시지]\n' +
+            ' • .우편수령 [번호] / .우편일괄수령 / .우편삭제 [번호]\n' +
             ' • .친구추가/.친구삭제/.친구목록\n\n' +
             '📚 __정보__\n' +
             ' • .도감 [몬스터/아이템/물고기/스킬/펫/칭호]\n' +
@@ -1944,35 +1982,61 @@ var commandHandlers = {
         }
     },
     '.사용': function(player, args, replier, sender, account) {
-        var argString = args.join(' ');
-        if (!argString) {
-            replier.reply("⚠️ 사용할 아이템 이름을 입력해주세요. 예: .사용 포션");
+        if (args.length === 0) {
+            replier.reply("⚠️ 사용할 아이템 이름을 입력해주세요. 예: .사용 포션, .사용 포션 5");
             return;
         }
-        // 펫 먹이 사용 로직 추가
+        // 마지막 인자가 양의 숫자면 수량으로 인식 (그 외에는 아이템 이름의 일부)
+        var quantity = 1;
+        var lastArg = args[args.length - 1];
+        var asNum = parseInt(lastArg);
+        if (!isNaN(asNum) && String(asNum) === lastArg && asNum > 0 && args.length > 1) {
+            quantity = asNum;
+            args = args.slice(0, -1);
+        }
+        var argString = args.join(' ');
+        // 펫 먹이는 수량만큼 반복 호출 가능
         if (argString === '펫 먹이') {
-            commandHandlers['.펫먹이주기'](player, args, replier, sender, account);
+            for (var fi = 0; fi < quantity; fi++) {
+                if (!player.hasItem('펫 먹이')) break;
+                commandHandlers['.펫먹이주기'](player, [], { reply: function(){} }, sender, account);
+            }
+            replier.reply('🍖 펫 먹이 ' + quantity + '개 일괄 사용 완료. .펫정보 로 상태 확인.');
             return;
         }
         var itemData = GameData.items[argString];
-        if (!player.hasItem(argString)) {
-            replier.reply('⚠️ [' + argString + '] 아이템이 없습니다.');
-        } else if (!itemData || typeof itemData.effect !== 'function') {
+        if (!itemData) {
+            replier.reply('⚠️ 존재하지 않는 아이템입니다: ' + argString);
+            return;
+        }
+        if (!player.hasItem(argString, quantity)) {
+            var have = (player.inventory.find(function(i){ return i.name === argString; }) || { count: 0 }).count;
+            replier.reply('⚠️ [' + argString + '] 아이템이 부족합니다. (필요: ' + quantity + ', 보유: ' + have + ')');
+            return;
+        }
+        if (typeof itemData.effect !== 'function') {
             replier.reply('⚠️ [' + argString + '] 아이템은 사용할 수 없는 종류입니다.');
-        } else {
-            var effectMsg = itemData.effect(player);
+            return;
+        }
+        var lastEffect = '';
+        for (var ui = 0; ui < quantity; ui++) {
+            lastEffect = itemData.effect(player);
             player.removeItem(argString, 1);
-            var inRaid = player.party && raidSession[player.party];
-            if (inRaid) {
-                var status = raidSession[player.party].memberStatus.find(function(m) { return m.sender === sender; });
-                if (status) {
-                    status.hp = player.hp;
-                    status.maxHp = player.getMaxHp();
-                }
+        }
+        var inRaid = player.party && raidSession[player.party];
+        if (inRaid) {
+            var status = raidSession[player.party].memberStatus.find(function(m) { return m.sender === sender; });
+            if (status) {
+                status.hp = player.hp;
+                status.maxHp = player.getMaxHp();
             }
-            account.characters[player.className] = player;
-            saveAccount(sender, account);
-            replier.reply(effectMsg);
+        }
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        if (quantity > 1) {
+            replier.reply('🧪 [' + argString + '] x' + quantity + ' 일괄 사용 완료\n마지막 효과: ' + lastEffect);
+        } else {
+            replier.reply(lastEffect);
         }
     },
     '.장착': function(player, args, replier, sender, account) {
@@ -2777,17 +2841,71 @@ var commandHandlers = {
         saveData(Config.LOTTO_DATA_FILE, lottoData);
     },
     '.랭킹': function(player, args, replier, sender, account) {
-        var now = Date.now();
-        if (now - lastRankingUpdateTime > Config.RANKING_CACHE_DURATION) {
-            updateRankingCache();
-        }
-        if (rankingCache.length === 0) {
-            replier.reply("--- 🏆 레벨 랭킹 🏆 ---\n기록된 플레이어가 없습니다.");
+        var category = args[0] || '레벨';
+        var validCategories = ['레벨', '골드', '낚시', 'pvp', 'PvP', '길드', '업적'];
+        if (validCategories.indexOf(category) === -1) {
+            replier.reply('⚠️ 사용법: .랭킹 [레벨/골드/낚시/PvP/길드/업적]\n기본은 레벨 랭킹입니다.');
             return;
         }
-        var rankList = "--- 🏆 레벨 랭킹 🏆 ---\n";
-        rankingCache.forEach(function(p, index) {
-            rankList += (index + 1) + "위: " + p.name + " (Lv." + p.level + " " + p.className + ")\n";
+
+        // 길드 랭킹은 별도 흐름
+        if (category === '길드') {
+            return commandHandlers['.길드목록'](player, [], replier, sender, account);
+        }
+        // PvP 랭킹은 별도 흐름
+        if (category === 'pvp' || category === 'PvP') {
+            return commandHandlers['.pvp랭킹'](player, [], replier, sender, account);
+        }
+
+        var allCharacters = [];
+        var files = dataFolder.listFiles();
+        if (files) {
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var fn = file.getName();
+                if (!fn.endsWith('.json') || fn === Config.MARKET_DATA_FILE || fn === Config.LOTTO_DATA_FILE || fn === Config.GUILDS_DATA_FILE) continue;
+                var ad = readFile(fn);
+                if (!ad || !ad.characters) continue;
+                for (var cn in ad.characters) {
+                    var c = ad.characters[cn];
+                    if (!c || !c.name) continue;
+                    allCharacters.push({
+                        name: c.name,
+                        level: c.level || 1,
+                        gold: c.gold || 0,
+                        fishingLevel: c.fishingLevel || 1,
+                        achievements: Object.keys(c.achievements || {}).length,
+                        className: c.className
+                    });
+                }
+            }
+        }
+        if (allCharacters.length === 0) {
+            replier.reply("--- 🏆 " + category + " 랭킹 🏆 ---\n기록된 플레이어가 없습니다.");
+            return;
+        }
+        var sortKey, headerEmoji, valueGetter;
+        if (category === '레벨') {
+            sortKey = 'level';
+            headerEmoji = '🏆';
+            valueGetter = function(p) { return 'Lv.' + p.level + ' ' + p.className; };
+        } else if (category === '골드') {
+            sortKey = 'gold';
+            headerEmoji = '💰';
+            valueGetter = function(p) { return p.gold + ' G'; };
+        } else if (category === '낚시') {
+            sortKey = 'fishingLevel';
+            headerEmoji = '🎣';
+            valueGetter = function(p) { return '낚시 Lv.' + p.fishingLevel; };
+        } else if (category === '업적') {
+            sortKey = 'achievements';
+            headerEmoji = '🏅';
+            valueGetter = function(p) { return p.achievements + '개'; };
+        }
+        allCharacters.sort(function(a, b) { return b[sortKey] - a[sortKey]; });
+        var rankList = "--- " + headerEmoji + " " + category + " 랭킹 " + headerEmoji + " ---\n";
+        allCharacters.slice(0, Config.RANKING_DISPLAY_COUNT).forEach(function(p, index) {
+            rankList += (index + 1) + "위: " + p.name + " (" + valueGetter(p) + ")\n";
         });
         replier.reply(rankList.trim());
     },
@@ -2819,11 +2937,162 @@ var commandHandlers = {
             replier.reply("⚠️ 이미 해당 캐릭터로 접속해 있습니다.");
             return;
         }
+        if (player && player.party) {
+            replier.reply("⚠️ 파티에 소속된 동안에는 캐릭터를 변경할 수 없습니다. 먼저 .파티탈퇴 를 사용하세요.");
+            return;
+        }
         account.characters[player.className] = player;
         account.activeCharacterName = targetClass;
         players[sender] = account.characters[targetClass];
         saveAccount(sender, account);
         replier.reply("✅ 캐릭터를 '" + players[sender].name + "' (" + targetClass + ")(으)로 변경했습니다.");
+    },
+    '.이름변경': function(player, args, replier, sender, account) {
+        var newName = args.join(' ');
+        if (!newName) {
+            replier.reply('⚠️ 사용법: .이름변경 [새이름]\n• 비용: 5000 G\n• 길드/파티 가입 중이면 변경 불가');
+            return;
+        }
+        if (newName.length < 2 || newName.length > 12) {
+            replier.reply('⚠️ 이름은 2~12자 이내로 설정해주세요.');
+            return;
+        }
+        if (player.party) {
+            replier.reply('⚠️ 파티에 소속된 동안에는 이름을 변경할 수 없습니다.');
+            return;
+        }
+        if (player.gold < 5000) {
+            replier.reply('⚠️ 골드가 부족합니다. (필요: 5000 G)');
+            return;
+        }
+        // 이름 중복 체크
+        var dup = false;
+        var files = dataFolder.listFiles();
+        if (files) {
+            for (var i = 0; i < files.length; i++) {
+                var fn = files[i].getName();
+                if (!fn.endsWith('.json') || fn === Config.MARKET_DATA_FILE || fn === Config.LOTTO_DATA_FILE || fn === Config.GUILDS_DATA_FILE) continue;
+                var ad = readFile(fn);
+                if (!ad || !ad.characters) continue;
+                for (var cn in ad.characters) {
+                    if (ad.characters[cn].name === newName) { dup = true; break; }
+                }
+                if (dup) break;
+            }
+        }
+        if (dup) {
+            replier.reply('⚠️ 이미 사용 중인 이름입니다. 다른 이름을 시도해주세요.');
+            return;
+        }
+        var oldName = player.name;
+        player.name = newName;
+        player.gold -= 5000;
+        // 친구 목록의 이전 이름은 그대로 (오프라인 정보이므로)
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        replier.reply("✅ 캐릭터 이름이 '" + oldName + "'에서 '" + newName + "'(으)로 변경되었습니다. (5000 G 차감)");
+    },
+    '.버프': function(player, args, replier, sender, account) {
+        var msg = '--- ✨ 현재 버프 상태 ---\n';
+        var hasAny = false;
+        var now = Date.now();
+        if (player.buffs) {
+            if (player.buffs.att && player.buffs.att.expires > now) {
+                hasAny = true;
+                msg += '💪 공격력 ' + Math.floor((player.buffs.att.multiplier - 1) * 100) + '% (남은 ' + Math.ceil((player.buffs.att.expires - now) / 60000) + '분)\n';
+            }
+            if (player.buffs.def && player.buffs.def.expires > now) {
+                hasAny = true;
+                var defPct = Math.floor((player.buffs.def.multiplier - 1) * 100);
+                msg += '🛡️ 방어력 ' + (defPct >= 0 ? '+' : '') + defPct + '% (남은 ' + Math.ceil((player.buffs.def.expires - now) / 60000) + '분)\n';
+            }
+            if (player.buffs.poison && player.buffs.poison.expires > now) {
+                hasAny = true;
+                msg += '☠️ 독바르기 +' + player.buffs.poison.extraDamage + ' 추가 데미지 (남은 ' + Math.ceil((player.buffs.poison.expires - now) / 60000) + '분)\n';
+            }
+            if (player.buffs.golem && player.buffs.golem.expires > now) {
+                hasAny = true;
+                msg += '🗿 골렘 +' + player.buffs.golem.extraDamage + ' 추가 데미지 (남은 ' + Math.ceil((player.buffs.golem.expires - now) / 60000) + '분)\n';
+            }
+        }
+        if (account.pet && account.pet.isActive) {
+            hasAny = true;
+            var petData = GameData.pets[account.pet.type];
+            var bv = petData.buff.baseValue + (petData.buff.growth * (account.pet.level - 1));
+            var bt = { att: '공격력', def: '방어력', maxHp: '최대HP' }[petData.buff.type];
+            msg += '🐾 [' + account.pet.name + '] ' + bt + ' +' + bv + '\n';
+        }
+        if (player.title && GameData.titles[player.title]) {
+            var t = GameData.titles[player.title];
+            if (t.bonus && (t.bonus.att || t.bonus.def)) {
+                hasAny = true;
+                msg += '🏅 [' + player.title + '] 공격 +' + (t.bonus.att || 0) + ' 방어 +' + (t.bonus.def || 0) + '\n';
+            }
+        }
+        var equippedSets = player.getEquippedSetInfo();
+        for (var setName in equippedSets) {
+            var count = equippedSets[setName];
+            var bonuses = GameData.itemSets[setName].bonuses;
+            if (bonuses[String(count)]) {
+                hasAny = true;
+                msg += '⚔️ [' + setName + '] (' + count + '세트): ' + bonuses[String(count)].description + '\n';
+            }
+        }
+        if (!hasAny) {
+            msg += '적용 중인 버프나 효과가 없습니다.';
+        }
+        replier.reply(msg.trim());
+    },
+    '.우편삭제': function(player, args, replier, sender, account) {
+        if (!player.mailbox || player.mailbox.length === 0) {
+            replier.reply('⚠️ 받은 우편이 없습니다.');
+            return;
+        }
+        if (args[0] === '전체') {
+            var count = player.mailbox.length;
+            player.mailbox = [];
+            account.characters[player.className] = player;
+            saveAccount(sender, account);
+            replier.reply('🗑️ 우편 ' + count + '통을 모두 삭제했습니다. (보상 미수령)');
+            return;
+        }
+        var idx = parseInt(args[0]) - 1;
+        if (isNaN(idx) || idx < 0 || idx >= player.mailbox.length) {
+            replier.reply('⚠️ 사용법: .우편삭제 [번호] 또는 .우편삭제 전체');
+            return;
+        }
+        var deleted = player.mailbox[idx];
+        player.mailbox.splice(idx, 1);
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        replier.reply('🗑️ ' + deleted.from + '님의 우편을 삭제했습니다. (보상 미수령)');
+    },
+    '.지도': function(player, args, replier, sender, account) {
+        var msg = '--- 🗺️ 사냥터 지도 (레벨 가이드) ---\n';
+        var monsters = GameData.monsters;
+        var levelGroups = [
+            { range: [1, 5], label: '🌱 초보 사냥터 (Lv.1~5 추천)', minHp: 0, maxHp: 50 },
+            { range: [6, 15], label: '🌳 숲 (Lv.6~15)', minHp: 51, maxHp: 100 },
+            { range: [16, 25], label: '🏔️ 산악 (Lv.16~25)', minHp: 101, maxHp: 250 },
+            { range: [26, 40], label: '🔥 화염 지대 (Lv.26~40)', minHp: 251, maxHp: 500 },
+            { range: [41, 60], label: '⚔️ 고난도 (Lv.41~60)', minHp: 501, maxHp: 999 },
+            { range: [61, 99], label: '👹 레이드 (파티 필수)', minHp: 1000, maxHp: 999999 }
+        ];
+        levelGroups.forEach(function(g) {
+            var hits = [];
+            Object.keys(monsters).forEach(function(name) {
+                var m = monsters[name];
+                if (m.hp >= g.minHp && m.hp <= g.maxHp) hits.push(name);
+            });
+            if (hits.length === 0) return;
+            msg += '\n' + g.label + '\n';
+            hits.forEach(function(n) {
+                var m = monsters[n];
+                msg += '  • ' + n + ' (HP ' + m.hp + ', EXP ' + m.exp + ', ' + m.gold + ' G)\n';
+            });
+        });
+        msg += '\n💡 .사냥 [몬스터이름] 으로 사냥 시작!';
+        replier.reply(msg);
     },
     '.전쟁모드': function(player, args, replier, sender, account) {
         player.warMode = !player.warMode;
@@ -4894,10 +5163,10 @@ function checkPlayerState(player, cmd) {
     var allowedCommands = [];
     var message = "";
     var alwaysAllowed = ['.내정보', '.인벤토리', '.장비', '.퀘스트', '.내캐릭터', '.저장', '.도움말', '.명령어',
-                          '.펫', '.펫정보', '.캐릭터변경', '.통계', '.칭호', '.업적', '.일일퀘스트', '.스킬목록',
-                          '.우편함', '.우편수령', '.우편일괄수령', '.친구목록', '.강화정보',
-                          '.도감', '.몬스터도감', '.아이템도감',
-                          '.길드정보', '.길드원', '.길드목록', '.길드초대수락', '.길드초대거절'];
+                          '.펫', '.펫정보', '.통계', '.칭호', '.업적', '.일일퀘스트', '.스킬목록',
+                          '.우편함', '.우편수령', '.우편일괄수령', '.우편삭제', '.친구목록', '.강화정보',
+                          '.도감', '.지도', '.몬스터도감', '.아이템도감', '.버프', '.랭킹',
+                          '.길드정보', '.길드원', '.길드목록', '.길드초대수락', '.길드초대거절', '.길드채팅'];
     var combatSkills = ['.강타', '.파이어볼', '.힐', '.독바르기',
                          '.분노폭발', '.신성한방패', '.메테오', '.골렘소환', '.암살', '.훔치기', '.부활', '.아수라파천무'];
 
