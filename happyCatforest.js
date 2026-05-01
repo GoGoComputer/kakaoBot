@@ -1,41 +1,54 @@
 /**
- * 묘냥의 숲 RPG 게임 스크립트 v3.7.0 - 핵심 RPG 시스템 확장
+ * 묘냥의 숲 RPG 게임 스크립트 v3.8.0 - 사회적 콘텐츠 대확장 + 명령어 프리픽스 변경
  * * 제작: momo
  * * 수정: Gemini, 묘냥, Claude
+ * * 주요 변경사항 (v3.8.0):
+ * - [중대변경] 모든 명령어 프리픽스 / → . 으로 변경 (카카오톡 봇 친화적)
+ *   예: /내정보 → .내정보, /사냥 → .사냥
+ * - [기능] 길드 시스템 대규모 추가 (15개 신규 명령어)
+ *   • .길드창설/.길드신청/.길드초대/.길드초대수락/.길드초대거절
+ *   • .길드수락/.길드거절 (가입 신청 처리), .길드추방, .길드위임
+ *   • .길드정보/.길드원/.길드목록 (랭킹), .길드기부 (자금/경험치)
+ *   • .길드공지/.길드채팅/.길드탈퇴/.길드해산
+ *   • 길드 레벨업 시스템, 최대 20명, 길드 자금 공유
+ * - [기능] 통합 도감 .도감 추가 (몬스터/아이템/물고기/스킬/펫/칭호)
+ * - [기능] 수산시장 등록 회수 .시장취소 추가 ([번호] 또는 전체)
+ * - [버그수정] .우편보내기 아이템 파싱 개선 (이름이 여러 단어인 경우 안전 파싱)
+ * - [개선] .도움말 v3.8.0 갱신 + 신규 명령어 분류
  * * 주요 변경사항 (v3.7.0):
- * - [기능] 장비 강화 시스템 (+1 ~ +10): /강화, /강화정보
+ * - [기능] 장비 강화 시스템 (+1 ~ +10): .강화, .강화정보
  *   • 강화석/축복의 가루 아이템 추가, 단계별 성공률 및 능력치 +10%/단계
- * - [기능] 우편함 시스템: /우편함, /우편보내기, /우편수령, /우편일괄수령
+ * - [기능] 우편함 시스템: .우편함, .우편보내기, .우편수령, .우편일괄수령
  *   • 오프라인 플레이어에게도 골드/아이템 전달 가능, 우편함 30통 제한
- * - [기능] 친구 시스템: /친구추가, /친구삭제, /친구목록 (온/오프 표시)
- * - [기능] 일일 퀘스트 일괄 수령: /일일일괄수령
+ * - [기능] 친구 시스템: .친구추가, .친구삭제, .친구목록 (온/오프 표시)
+ * - [기능] 일일 퀘스트 일괄 수령: .일일일괄수령
  * - [개선] 일일 퀘스트 5종 → 10종으로 확대 (쥐/멧돼지/오크/트롤 추가)
  * - [개선] 업적 10종 → 22종으로 확대 (몬스터별/레벨별/낚시별/강화 등)
- * - [개선] 자동 알림: 미출석 시 /출석 안내, 우편 도착 시 /우편함 안내
+ * - [개선] 자동 알림: 미출석 시 .출석 안내, 우편 도착 시 .우편함 안내
  *   (세션당 1회만, 비강제)
  * * 주요 변경사항 (v3.6.1):
  * - [버그수정] 조합 재료 수급 불가 문제 해결: 9종의 신규 몬스터 추가
  *   (쥐/멧돼지/오크/나무정령/보석거미/트롤/오우거/화염정령/어린 용)
  * - [버그수정] 칭호 보너스(att/def)가 전투에 실제 적용되지 않던 문제 수정.
- * - [기능] /파티거절 명령어 추가.
- * - [기능] /스킬목록 명령어 추가 - 현재 직업의 스킬 정보 표시.
+ * - [기능] .파티거절 명령어 추가.
+ * - [기능] .스킬목록 명령어 추가 - 현재 직업의 스킬 정보 표시.
  * - [기능] 일일 퀘스트 3개 모두 완료 시 보너스 (1000G + 화려한 보물상자).
- * - [개선] /인벤토리 출력 카테고리화: 무기/방어구/방패/소비/상자/특수/재료별 구분.
+ * - [개선] .인벤토리 출력 카테고리화: 무기/방어구/방패/소비/상자/특수/재료별 구분.
  * - [개선] 어류 보관함 표시 상위 20마리만 노출, 초과시 요약.
  * * 주요 변경사항 (v3.6.0):
- * - [기능] 2차 직업 전 직업의 고유 스킬 명령어 구현 (/분노폭발, /신성한방패, /메테오, /골렘소환, /암살, /훔치기, /부활, /아수라파천무).
- * - [기능] 튜토리얼 시스템 추가 (/튜토리얼, /튜토리얼다음, /튜토리얼완료, /튜토리얼재시작).
- * - [기능] 출석 체크 시스템 (/출석) - 연속 출석 보상 및 7/30일 누적 보상.
- * - [기능] 일일 퀘스트 시스템 (/일일퀘스트, /일일보상).
- * - [기능] 업적 시스템 (/업적) - 10개 업적 달성 시 자동 보상.
- * - [기능] 칭호 시스템 (/칭호) - 레벨 도달 시 자동 칭호 부여.
- * - [기능] 상점 카테고리화 (/상점 [카테고리]) - 소비/무기/방어구/상자/특수.
- * - [기능] 구매 수량 지정 (/구매 [아이템] [수량]).
- * - [기능] 상자 일괄 열기 (/상자일괄열기).
- * - [기능] 골드 송금 (/송금) - 5% 수수료.
- * - [기능] PvP 랭킹/전적 (/pvp랭킹, /pvp전적) - 승리 시 전리품 5%.
- * - [기능] 통계 화면 (/통계) - 처치/PvP/업적/출석.
- * - [기능] 파티 채팅 (/파티챗).
+ * - [기능] 2차 직업 전 직업의 고유 스킬 명령어 구현 (.분노폭발, .신성한방패, .메테오, .골렘소환, .암살, .훔치기, .부활, .아수라파천무).
+ * - [기능] 튜토리얼 시스템 추가 (.튜토리얼, .튜토리얼다음, .튜토리얼완료, .튜토리얼재시작).
+ * - [기능] 출석 체크 시스템 (.출석) - 연속 출석 보상 및 7/30일 누적 보상.
+ * - [기능] 일일 퀘스트 시스템 (.일일퀘스트, .일일보상).
+ * - [기능] 업적 시스템 (.업적) - 10개 업적 달성 시 자동 보상.
+ * - [기능] 칭호 시스템 (.칭호) - 레벨 도달 시 자동 칭호 부여.
+ * - [기능] 상점 카테고리화 (.상점 [카테고리]) - 소비/무기/방어구/상자/특수.
+ * - [기능] 구매 수량 지정 (.구매 [아이템] [수량]).
+ * - [기능] 상자 일괄 열기 (.상자일괄열기).
+ * - [기능] 골드 송금 (.송금) - 5% 수수료.
+ * - [기능] PvP 랭킹/전적 (.pvp랭킹, .pvp전적) - 승리 시 전리품 5%.
+ * - [기능] 통계 화면 (.통계) - 처치/PvP/업적/출석.
+ * - [기능] 파티 채팅 (.파티챗).
  * - [개선] PvP 승리 시 패자 골드 5% 전리품 획득.
  * - [개선] 골렘소환 등 모든 2차 직업 버프가 전투에 실제로 적용.
  * - [개선] 사냥/낚시/조합 시 일일 퀘스트, 업적 자동 갱신.
@@ -50,6 +63,7 @@ var Config = {
     DATA_FOLDER_PATH: "sdcard/Rbot/RPG_Data_v2.7.1",
     MARKET_DATA_FILE: "market.json",
     LOTTO_DATA_FILE: "lotto.json",
+    GUILDS_DATA_FILE: "guilds.json",
     BATTLE_ITEM_DROP_RATE: 0.3,
     RAID_ITEM_DROP_RATE_MULTIPLIER: 2,
     REPAIR_COST_MULTIPLIER: 0.1,
@@ -109,7 +123,7 @@ var GameData = {
         // [추가] 전직 관련 아이템
         '영웅의 증표': { name: '영웅의 증표', type: 'special', price: 0, description: '영웅의 자격을 증명하는 빛나는 증표. 전직에 사용된다.' },
         // [추가] 강화 관련 아이템
-        '강화석': { name: '강화석', type: 'special', price: 1000, description: '장비 강화에 사용하는 마법의 돌. /강화 명령어로 사용.' },
+        '강화석': { name: '강화석', type: 'special', price: 1000, description: '장비 강화에 사용하는 마법의 돌. .강화 명령어로 사용.' },
         '축복의 가루': { name: '축복의 가루', type: 'special', price: 5000, description: '강화 시 함께 사용하면 강화 실패 시 단계가 떨어지지 않게 보호.' },
         '단검': { name: '단검', type: 'weapon', att: 5, price: 50, maxDura: 100 },
         '조잡한 철검': { name: '조잡한 철검', type: 'weapon', att: 10, price: 120, maxDura: 100 },
@@ -233,7 +247,7 @@ var GameData = {
         },
         '힐러': {
             hp: 90, mp: 100, att: 6, def: 6, jobTier: 1,
-            nextJob: { '프리스트': '회복/부활', '몽크': '전투/회복' },
+            nextJob: { '프리스트': '회복.부활', '몽크': '전투.회복' },
             skills: {
                 '치유': { name: '치유', mpCost: 25, healAmount: 80, description: '아군의 HP를 회복시킵니다.' }
             }
@@ -433,9 +447,11 @@ var tradeRequests = {};
 var tradeSessions = {};
 var attendanceHintSent = {}; // sender별 출석 힌트 전송 여부 (세션내)
 var mailHintSent = {}; // sender별 우편 도착 힌트 전송 여부 (세션내)
+var guildInvitations = {}; // sender -> guildId (길드 초대 대기)
 
 var market = loadData(Config.MARKET_DATA_FILE) || {};
 var lottoData = loadData(Config.LOTTO_DATA_FILE) || { pot: Config.INITIAL_LOTTO_POT, tickets: {}, lastWinner: null, lastDrawTime: null };
+var guilds = loadData(Config.GUILDS_DATA_FILE) || {};
 
 // -------------------------------------------
 // 4. 플레이어 객체 및 데이터 I/O
@@ -474,6 +490,7 @@ function Player(name, className, sender) {
     this.tutorialCompleted = false;
     this.mailbox = [];
     this.friends = [];
+    this.guildId = null;
 }
 
 Player.prototype = {
@@ -789,6 +806,7 @@ function loadAccount(sender) {
             });
             if (!playerInstance.mailbox) playerInstance.mailbox = [];
             if (!playerInstance.friends) playerInstance.friends = [];
+            if (playerInstance.guildId === undefined) playerInstance.guildId = null;
             // 신규 필드 마이그레이션 v3.6
             if (!playerInstance.killCount) playerInstance.killCount = { total: 0, byMonster: {} };
             if (!playerInstance.achievements) playerInstance.achievements = {};
@@ -937,15 +955,15 @@ function updateDailyQuestProgress(player, eventType, eventTarget) {
 
 // 튜토리얼 단계별 메시지
 var TUTORIAL_STEPS = [
-    { id: 1, title: '환영 인사', message: '🌳 묘냥의 숲에 오신 것을 환영합니다! 🌳\n저는 당신의 모험을 도와드릴 가이드입니다.\n\n다음 단계로 가려면 /튜토리얼다음 을 입력하세요.' },
-    { id: 2, title: '내 정보 확인', message: '📋 1단계: 자신의 정보 확인하기\n\n/내정보 명령어를 입력하면 캐릭터의 레벨, HP, MP, 능력치를 확인할 수 있습니다.\n\n시도해 본 다음 /튜토리얼다음 을 입력하세요.' },
-    { id: 3, title: '첫 사냥', message: '⚔️ 2단계: 첫 사냥하기\n\n/사냥 슬라임 명령어로 슬라임을 사냥해보세요.\n전투 중에는 /공격 으로 공격, /도망 으로 도망갈 수 있습니다.\n\n사냥에 성공한 후 /튜토리얼다음 을 입력하세요.' },
-    { id: 4, title: '상점 이용', message: '🛒 3단계: 상점 이용하기\n\n/상점 으로 상점에 들어가 아이템을 구경하고, /구매 [아이템] 으로 아이템을 살 수 있습니다.\n예: /구매 포션\n\n/나가기 로 상점에서 나온 후 /튜토리얼다음 을 입력하세요.' },
-    { id: 5, title: '장비 장착', message: '🛡️ 4단계: 장비 장착하기\n\n/장착 [아이템] 명령어로 무기/방어구/방패를 장착할 수 있습니다.\n예: /장착 단검\n/장비 명령어로 현재 장착 중인 장비를 확인하세요.\n\n준비됐으면 /튜토리얼다음 을 입력하세요.' },
-    { id: 6, title: '낚시', message: '🎣 5단계: 낚시 도전\n\n/낚시 명령어로 낚시를 시작할 수 있습니다.\n잡은 물고기는 /요리 로 요리하거나 /수산시장 에 등록해 판매할 수 있습니다.\n\n다음 단계는 /튜토리얼다음 을 입력하세요.' },
-    { id: 7, title: '퀘스트', message: '📜 6단계: 퀘스트 수락\n\n/퀘스트 로 수락 가능한 퀘스트를 확인하고, /수락 [퀘스트이름] 으로 시작합니다.\n예: /수락 늑대 사냥꾼\n조건 달성 후 /완료 [이름] 으로 보상을 받으세요.\n\n다음은 /튜토리얼다음 입니다.' },
-    { id: 8, title: '펫', message: '🐾 7단계: 펫과 함께!\n\n사냥에서 가끔 [펫 알]을 얻을 수 있어요. /펫알부화 로 부화시키고, /펫먹이주기 로 키워보세요.\n/펫 명령어로 자세한 펫 명령어를 확인할 수 있습니다.\n\n마지막 단계는 /튜토리얼다음 입니다.' },
-    { id: 9, title: '파티 & 레이드', message: '👥 8단계: 친구와 함께!\n\n/파티생성, /파티초대 [이름] 으로 파티를 만들고, /어비스입장 으로 레이드를 시작하세요.\n레이드 클리어 시 강력한 보상을 얻을 수 있습니다.\n\n튜토리얼 종료는 /튜토리얼완료 를 입력하세요.' }
+    { id: 1, title: '환영 인사', message: '🌳 묘냥의 숲에 오신 것을 환영합니다! 🌳\n저는 당신의 모험을 도와드릴 가이드입니다.\n\n다음 단계로 가려면 .튜토리얼다음 을 입력하세요.' },
+    { id: 2, title: '내 정보 확인', message: '📋 1단계: 자신의 정보 확인하기\n\n.내정보 명령어를 입력하면 캐릭터의 레벨, HP, MP, 능력치를 확인할 수 있습니다.\n\n시도해 본 다음 .튜토리얼다음 을 입력하세요.' },
+    { id: 3, title: '첫 사냥', message: '⚔️ 2단계: 첫 사냥하기\n\n.사냥 슬라임 명령어로 슬라임을 사냥해보세요.\n전투 중에는 .공격 으로 공격, .도망 으로 도망갈 수 있습니다.\n\n사냥에 성공한 후 .튜토리얼다음 을 입력하세요.' },
+    { id: 4, title: '상점 이용', message: '🛒 3단계: 상점 이용하기\n\n.상점 으로 상점에 들어가 아이템을 구경하고, .구매 [아이템] 으로 아이템을 살 수 있습니다.\n예: .구매 포션\n\n.나가기 로 상점에서 나온 후 .튜토리얼다음 을 입력하세요.' },
+    { id: 5, title: '장비 장착', message: '🛡️ 4단계: 장비 장착하기\n\n.장착 [아이템] 명령어로 무기/방어구/방패를 장착할 수 있습니다.\n예: .장착 단검\n.장비 명령어로 현재 장착 중인 장비를 확인하세요.\n\n준비됐으면 .튜토리얼다음 을 입력하세요.' },
+    { id: 6, title: '낚시', message: '🎣 5단계: 낚시 도전\n\n.낚시 명령어로 낚시를 시작할 수 있습니다.\n잡은 물고기는 .요리 로 요리하거나 .수산시장 에 등록해 판매할 수 있습니다.\n\n다음 단계는 .튜토리얼다음 을 입력하세요.' },
+    { id: 7, title: '퀘스트', message: '📜 6단계: 퀘스트 수락\n\n.퀘스트 로 수락 가능한 퀘스트를 확인하고, .수락 [퀘스트이름] 으로 시작합니다.\n예: .수락 늑대 사냥꾼\n조건 달성 후 .완료 [이름] 으로 보상을 받으세요.\n\n다음은 .튜토리얼다음 입니다.' },
+    { id: 8, title: '펫', message: '🐾 7단계: 펫과 함께!\n\n사냥에서 가끔 [펫 알]을 얻을 수 있어요. .펫알부화 로 부화시키고, .펫먹이주기 로 키워보세요.\n.펫 명령어로 자세한 펫 명령어를 확인할 수 있습니다.\n\n마지막 단계는 .튜토리얼다음 입니다.' },
+    { id: 9, title: '파티 & 레이드', message: '👥 8단계: 친구와 함께!\n\n.파티생성, .파티초대 [이름] 으로 파티를 만들고, .어비스입장 으로 레이드를 시작하세요.\n레이드 클리어 시 강력한 보상을 얻을 수 있습니다.\n\n튜토리얼 종료는 .튜토리얼완료 를 입력하세요.' }
 ];
 
 function getTutorialMessage(step) {
@@ -982,7 +1000,7 @@ function formatEquipmentDisplay(equipmentSlot) {
 
 function startBattle(sender, player, monsterName) {
     if (!GameData.monsters[monsterName]) {
-        return '존재하지 않는 몬스터입니다. 사냥 가능한 몬스터 목록은 /몬스터도감 에서 확인하세요.';
+        return '존재하지 않는 몬스터입니다. 사냥 가능한 몬스터 목록은 .몬스터도감 에서 확인하세요.';
     }
     var monster = JSON.parse(JSON.stringify(GameData.monsters[monsterName]));
     battleSession[sender] = {
@@ -1096,7 +1114,7 @@ function getBattleStatus(sender) {
         '👹 ' + monster.name + ': HP ' + monster.hp + '\n' +
         '-------------------\n' +
         session.log.join('\n') + '\n\n' +
-        '명령어: /공격, /도망, /사용 [아이템], /강타, /파이어볼 등 스킬';
+        '명령어: .공격, .도망, .사용 [아이템], .강타, .파이어볼 등 스킬';
 }
 
 function handlePvpAction(sender) {
@@ -1173,7 +1191,7 @@ function getPvpStatus(sender) {
         '🛡️ ' + waitingPlayer.name + ': HP ' + waitingPlayer.hp + '/' + waitingPlayer.getMaxHp() + '\n' +
         '---------------------------\n' +
         (session.log ? session.log.join('\n') : '') + '\n\n' +
-        '명령어: /공격, /도망, /사용 [아이템], /강타, /파이어볼 등 스킬';
+        '명령어: .공격, .도망, .사용 [아이템], .강타, .파이어볼 등 스킬';
 }
 
 function startRaid(leaderSender, replier) {
@@ -1386,7 +1404,7 @@ function getRaidStatus(leaderSender) {
     });
     statusMsg += "--------------------------------------\n";
     statusMsg += session.log.join("\n") + "\n\n";
-    statusMsg += "명령어: /어비스공격, /사용 [아이템], /어비스포기";
+    statusMsg += "명령어: .어비스공격, .사용 [아이템], .어비스포기";
     return statusMsg;
 }
 
@@ -1410,7 +1428,7 @@ function getTradeStatus(session) {
     });
     if (session.p2.items.length === 0) msg += ' • 아이템: 없음\n';
     msg += '----------------\n';
-    msg += '명령어: /거래올리기, /거래골드, /거래확인, /거래취소';
+    msg += '명령어: .거래올리기, .거래골드, .거래확인, .거래취소';
     return msg;
 }
 
@@ -1544,12 +1562,12 @@ function updateRankingCache() {
 // 7. 메인 명령어 핸들러
 // -------------------------------------------
 var commandHandlers = {
-    '/rpg': function(player, args, replier, sender, account) {
-        replier.reply('🌳 묘냥의 숲에 오신 것을 환영합니다! 🌳\n\n"/생성 [이름] [직업]"으로 캐릭터를 만들어주세요.\n(직업: 전사, 마법사, 도적, 힐러)');
+    '.rpg': function(player, args, replier, sender, account) {
+        replier.reply('🌳 묘냥의 숲에 오신 것을 환영합니다! 🌳\n\n".생성 [이름] [직업]"으로 캐릭터를 만들어주세요.\n(직업: 전사, 마법사, 도적, 힐러)');
     },
-    '/생성': function(player, args, replier, sender, account) {
+    '.생성': function(player, args, replier, sender, account) {
         if (!args[0] || !args[1]) {
-            replier.reply('⚠️ 사용법: /생성 [이름] [직업]\n(직업: 전사, 마법사, 도적, 힐러)');
+            replier.reply('⚠️ 사용법: .생성 [이름] [직업]\n(직업: 전사, 마법사, 도적, 힐러)');
             return;
         }
         var name = args[0];
@@ -1559,7 +1577,7 @@ var commandHandlers = {
             return;
         }
         if (account.characters[className]) {
-            replier.reply('⚠️ 이미 해당 직업의 캐릭터가 존재합니다. /캐릭터변경 으로 접속하거나 다른 직업을 선택해주세요.');
+            replier.reply('⚠️ 이미 해당 직업의 캐릭터가 존재합니다. .캐릭터변경 으로 접속하거나 다른 직업을 선택해주세요.');
             return;
         }
         var newPlayer = new Player(name, className, sender);
@@ -1569,86 +1587,108 @@ var commandHandlers = {
         }
         players[sender] = account.characters[account.activeCharacterName];
         saveAccount(sender, account);
-        replier.reply('🎉 캐릭터 "' + name + '" (' + className + ') 생성 완료! 🎉\n\n💡 처음이라면 /튜토리얼 명령어로 게임을 차근차근 배워보세요!\n💡 모든 명령어는 /명령어 로 확인할 수 있습니다.\n💡 매일 /출석 명령어를 입력해 보상을 받아가세요!');
+        replier.reply('🎉 캐릭터 "' + name + '" (' + className + ') 생성 완료! 🎉\n\n💡 처음이라면 .튜토리얼 명령어로 게임을 차근차근 배워보세요!\n💡 모든 명령어는 .명령어 로 확인할 수 있습니다.\n💡 매일 .출석 명령어를 입력해 보상을 받아가세요!');
     },
-    '/명령어': function(player, args, replier, sender, account) {
-        replier.reply('--- 묘냥의 숲 명령어 v3.7.0 ---\n' +
-            '👤 플레이어: /내정보, /인벤토리, /장비, /퀘스트, /랭킹, /내캐릭터, /통계, /칭호, /스킬목록\n' +
-            '📖 데일리: /튜토리얼, /출석, /일일퀘스트, /일일보상, /일일일괄수령, /업적\n' +
-            '🐾 펫: /펫, /펫정보, /펫알부화, /펫먹이주기, /펫동행, /펫이름변경, /펫진화\n' +
-            '✨ 성장: /캐릭터변경, /전직, /강화, /강화정보\n' +
-            '⚔️ 행동: /사냥, /상점, /취침, /장착, /해제, /사용, /수리\n' +
-            '🔥 PvP: /전쟁모드, /pk [이름], /pvp랭킹, /pvp전적\n' +
-            '✨ 1차 스킬: /힐, /강타, /파이어볼, /독바르기\n' +
-            '🏆 2차 스킬: /분노폭발, /신성한방패, /메테오, /골렘소환, /암살, /훔치기, /부활, /아수라파천무\n' +
-            '💰 거래: /판매, /아이템일괄판매, /물고기일괄판매, /송금\n' +
-            '📬 우편: /우편함, /우편보내기, /우편수령, /우편일괄수령\n' +
-            '🤝 친구: /친구추가, /친구삭제, /친구목록\n' +
-            '🛠️ 제작: /조합법, /조합, /요리법, /요리\n' +
-            '🎁 뽑기: /상자열기, /상자일괄열기\n' +
-            '👨‍👩‍👧‍👦 파티: /파티생성, /파티초대, /파티수락, /파티거절, /파티탈퇴, /파티해산, /파티정보, /파티챗\n' +
-            '👹 레이드: /어비스입장, /어비스공격, /어비스포기\n' +
-            '🤝 1:1 거래: /거래신청, /거래수락, /거래거절, /거래취소, /거래올리기, /거래골드, /거래확인\n' +
-            '🎣 경제: /낚시, /수산시장, /시장등록, /시장구매\n' +
-            '🎲 로또: /로또, /로또구매, /로또확인, /로또추첨\n' +
-            '📚 정보: /도움말, /몬스터도감, /아이템도감, /저장');
+    '.명령어': function(player, args, replier, sender, account) {
+        replier.reply('--- 묘냥의 숲 명령어 v3.8.0 ---\n' +
+            '👤 플레이어: .내정보, .인벤토리, .장비, .퀘스트, .랭킹, .내캐릭터, .통계, .칭호, .스킬목록\n' +
+            '📖 데일리: .튜토리얼, .출석, .일일퀘스트, .일일보상, .일일일괄수령, .업적\n' +
+            '🐾 펫: .펫, .펫정보, .펫알부화, .펫먹이주기, .펫동행, .펫이름변경, .펫진화\n' +
+            '✨ 성장: .캐릭터변경, .전직, .강화, .강화정보\n' +
+            '⚔️ 행동: .사냥, .상점, .구매, .취침, .장착, .해제, .사용, .수리, .나가기\n' +
+            '🔥 PvP: .전쟁모드, .pk [이름], .pvp랭킹, .pvp전적\n' +
+            '✨ 1차 스킬: .힐, .강타, .파이어볼, .독바르기\n' +
+            '🏆 2차 스킬: .분노폭발, .신성한방패, .메테오, .골렘소환, .암살, .훔치기, .부활, .아수라파천무\n' +
+            '⚔️ 전투: .공격, .도망\n' +
+            '📜 퀘스트: .수락 [퀘스트], .완료 [퀘스트]\n' +
+            '💰 거래: .판매, .아이템일괄판매, .물고기일괄판매, .송금\n' +
+            '📬 우편: .우편함, .우편보내기, .우편수령, .우편일괄수령\n' +
+            '🤝 친구: .친구추가, .친구삭제, .친구목록\n' +
+            '🏰 길드: .길드창설, .길드신청, .길드초대, .길드초대수락/거절, .길드수락/거절, .길드정보, .길드원, .길드기부, .길드공지, .길드채팅, .길드추방, .길드위임, .길드탈퇴, .길드해산, .길드목록\n' +
+            '🛠️ 제작: .조합법, .조합, .요리법, .요리\n' +
+            '🎁 뽑기: .상자열기, .상자일괄열기\n' +
+            '👨‍👩‍👧‍👦 파티: .파티생성, .파티초대, .파티수락, .파티거절, .파티탈퇴, .파티해산, .파티정보, .파티챗\n' +
+            '👹 레이드: .어비스입장, .어비스공격, .어비스포기\n' +
+            '🤝 1:1 거래: .거래신청, .거래수락, .거래거절, .거래취소, .거래올리기, .거래골드, .거래확인\n' +
+            '🎣 경제: .낚시, .낚시중지, .수산시장, .시장등록, .시장취소, .시장구매\n' +
+            '🎲 로또: .로또, .로또구매, .로또확인, .로또추첨\n' +
+            '📚 정보: .도움말, .도감, .몬스터도감, .아이템도감, .저장');
     },
-    '/도움말': function(player, args, replier, sender, account) {
+    '.도움말': function(player, args, replier, sender, account) {
         replier.reply(
-            '--- 묘냥의 숲 상세 도움말 v3.6.0 ---\n\n' +
+            '--- 묘냥의 숲 상세 도움말 v3.8.0 ---\n\n' +
             '📖 __기본 & 캐릭터__\n' +
-            ' • /생성 [이름] [직업]: 새 1차 직업 캐릭터 생성\n' +
-            ' • /내정보, /인벤토리, /장비, /저장, /랭킹, /통계, /칭호\n' +
-            ' • /내캐릭터: 보유한 모든 캐릭터 목록 보기\n' +
-            ' • /캐릭터변경 [직업]: 다른 캐릭터로 접속\n\n' +
-            '🆕 __신규 콘텐츠__\n' +
-            ' • /튜토리얼: 단계별 게임 안내 (신규 유저 추천)\n' +
-            ' • /출석: 일일 출석체크 - 연속 출석 시 보상↑\n' +
-            ' • /일일퀘스트: 매일 자동 갱신되는 퀘스트 3개\n' +
-            ' • /일일보상 [퀘스트이름]: 완료된 일일 퀘스트 보상 수령\n' +
-            ' • /업적: 업적 진행 상황 / 미달성 보상 보기\n' +
-            ' • /칭호: 자동 부여되는 레벨 칭호 확인\n\n' +
+            ' • .생성 [이름] [직업]: 새 1차 직업 캐릭터 생성\n' +
+            ' • .내정보, .인벤토리, .장비, .저장, .랭킹, .통계, .칭호\n' +
+            ' • .내캐릭터: 보유한 모든 캐릭터 목록 보기\n' +
+            ' • .캐릭터변경 [직업]: 다른 캐릭터로 접속\n\n' +
+            '🆕 __데일리 콘텐츠__\n' +
+            ' • .튜토리얼: 단계별 게임 안내 (신규 유저 추천)\n' +
+            ' • .출석: 일일 출석체크 - 연속 출석 시 보상↑\n' +
+            ' • .일일퀘스트: 매일 자동 갱신되는 퀘스트 3개\n' +
+            ' • .일일보상 [퀘스트이름] / .일일일괄수령\n' +
+            ' • .업적: 업적 진행 상황 / 미달성 보상 보기\n' +
+            ' • .칭호: 자동 부여되는 레벨 칭호 확인\n\n' +
             '✨ __성장 시스템__\n' +
-            " • /전직 [직업이름]: 50레벨, '영웅의 길' 퀘스트 완료 후 2차 직업으로 전직.\n" +
-            " • /펫진화: 20레벨 펫과 '진화의 돌'로 펫을 진화.\n\n" +
+            " • .전직 [직업이름]: 50레벨, '영웅의 길' 퀘스트 완료 후 2차 직업으로 전직.\n" +
+            " • .펫진화: 20레벨 펫과 '진화의 돌'로 펫을 진화.\n" +
+            ' • .강화 [무기/갑옷/방패]: 장비 강화 (+0~+10)\n' +
+            ' • .강화 [부위] 축복: 축복의 가루로 단계 보호\n\n' +
+            '🏰 __길드 시스템 [v3.8.0 신규]__\n' +
+            ' • .길드창설 [이름]: 길드 생성 (10000G)\n' +
+            ' • .길드신청 [이름] / .길드초대 [이름]: 가입 신청/초대\n' +
+            ' • .길드수락/거절 [신청자]: 가입 신청 처리 (길드장)\n' +
+            ' • .길드초대수락/거절: 받은 초대 응답\n' +
+            ' • .길드정보, .길드원, .길드목록\n' +
+            ' • .길드기부 [금액]: 자금 기부 + 경험치\n' +
+            ' • .길드공지 [내용]: 공지 변경 (길드장)\n' +
+            ' • .길드채팅 [메시지]: 길드원에게 표시\n' +
+            ' • .길드추방/위임/탈퇴/해산\n\n' +
             '🏆 __2차 직업 스킬__\n' +
-            ' • 버서커: /분노폭발 (5분간 공격력↑/방어력↓)\n' +
-            ' • 팔라딘: /신성한방패 (파티 방어력↑)\n' +
-            ' • 아크메이지: /메테오 (전투 강력 데미지)\n' +
-            ' • 서모너: /골렘소환 (10분간 추가 데미지)\n' +
-            ' • 어쌔신: /암살 (3배 데미지, 30% 치명타)\n' +
-            ' • 로그: /훔치기 (몬스터 골드 강탈)\n' +
-            ' • 프리스트: /부활 [이름] (전투불능 동료 부활)\n' +
-            ' • 몽크: /아수라파천무 (5연타 공격)\n\n' +
+            ' • 버서커: .분노폭발 (5분간 공격력↑/방어력↓)\n' +
+            ' • 팔라딘: .신성한방패 (파티 방어력↑)\n' +
+            ' • 아크메이지: .메테오 (전투 강력 데미지)\n' +
+            ' • 서모너: .골렘소환 (10분간 추가 데미지)\n' +
+            ' • 어쌔신: .암살 (3배 데미지, 30% 치명타)\n' +
+            ' • 로그: .훔치기 (몬스터 골드 강탈)\n' +
+            ' • 프리스트: .부활 [이름] (전투불능 동료 부활)\n' +
+            ' • 몽크: .아수라파천무 (5연타 공격)\n\n' +
             '🐾 __펫 시스템__\n' +
-            ' • /펫알부화: 인벤토리의 펫 알을 부화시킵니다.\n' +
-            ' • /펫정보, /펫먹이주기, /펫동행, /펫이름변경\n\n' +
-            '🛒 __상점__\n' +
-            ' • /상점: 카테고리 목록 보기\n' +
-            ' • /상점 [소비/무기/방어구/상자/특수]\n' +
-            ' • /구매 [아이템] [수량]: 수량 지정 구매\n' +
-            ' • /상자일괄열기 [상자이름]: 상자 한꺼번에 열기\n\n' +
-            '⚔️ __행동 & PvP__\n' +
-            ' • /사냥 [몬스터]: 1:1 몬스터 전투\n' +
-            ' • /전쟁모드: PvP 모드 ON/OFF (경험치 +3%)\n' +
-            ' • /pk [이름]: 전쟁모드를 켠 유저에게 대결 신청 (승리 시 패자 골드 5% 획득)\n' +
-            ' • /pvp랭킹, /pvp전적: PvP 순위 / 내 전적 보기\n' +
-            ' • /수리 [부위/전체]: 골드로 장비 내구도 회복\n' +
-            ' • /취침: 5분 후 HP/MP 모두 회복\n\n' +
+            ' • .펫알부화: 인벤토리의 펫 알을 부화시킵니다.\n' +
+            ' • .펫정보, .펫먹이주기, .펫동행, .펫이름변경\n\n' +
+            '🛒 __상점 & 거래__\n' +
+            ' • .상점 / .상점 [소비/무기/방어구/상자/특수]\n' +
+            ' • .구매 [아이템] [수량] / .나가기\n' +
+            ' • .상자열기, .상자일괄열기 [상자이름]\n' +
+            ' • .거래신청 [이름]: 1:1 아이템/골드 거래\n' +
+            ' • .송금 [이름] [금액]: 골드 송금 (5% 수수료)\n\n' +
+            '⚔️ __전투 & PvP__\n' +
+            ' • .사냥 [몬스터], .공격, .도망, .사용 [아이템]\n' +
+            ' • .수락/완료 [퀘스트]\n' +
+            ' • .전쟁모드: PvP ON/OFF (경험치 +3%)\n' +
+            ' • .pk [이름] / .pvp랭킹 / .pvp전적\n' +
+            ' • .수리 [부위/전체] / .취침 (HP/MP 회복)\n\n' +
             '👨‍👩‍👧‍👦 __파티 & 레이드__\n' +
-            ' • /파티생성, /파티초대 [이름], /파티수락 등\n' +
-            ' • /파티챗 [메시지]: 파티원에게 메시지 전송\n' +
-            ' • /어비스입장: 파티로 레이드 던전 입장\n' +
-            ' • /어비스공격: 파티원과 함께 보스 공격 (힐러는 자동 치유)\n\n' +
-            '🔄 __거래 & 경제__\n' +
-            ' • /거래신청 [이름]: 1:1 아이템/골드 거래\n' +
-            ' • /송금 [이름] [금액]: 골드 송금 (5% 수수료)\n' +
-            ' • /낚시, /수산시장, /시장구매 [번호], /로또 등\n\n' +
+            ' • .파티생성, .파티초대 [이름], .파티수락\n' +
+            ' • .파티챗 [메시지]: 파티원에게 메시지 전송\n' +
+            ' • .어비스입장 / .어비스공격 / .어비스포기\n\n' +
+            '🎣 __경제 & 수산__\n' +
+            ' • .낚시 / .낚시중지 / .요리 / .요리법\n' +
+            ' • .수산시장 / .시장등록 / .시장취소 / .시장구매\n' +
+            ' • .아이템일괄판매 / .물고기일괄판매\n' +
+            ' • .로또 / .로또구매 [수량] / .로또추첨\n\n' +
+            '📬 __우편 & 친구__\n' +
+            ' • .우편함, .우편보내기 [이름] [내용]\n' +
+            ' • .우편보내기 [이름] 골드 [금액] [메시지]\n' +
+            ' • .우편보내기 [이름] 아이템 [이름] [수량] [메시지]\n' +
+            ' • .친구추가/.친구삭제/.친구목록\n\n' +
             '📚 __정보__\n' +
-            ' • /몬스터도감 [이름], /아이템도감 [이름]'
+            ' • .도감 [몬스터/아이템/물고기/스킬/펫/칭호]\n' +
+            ' • .몬스터도감 [이름], .아이템도감 [이름]\n' +
+            ' • .스킬목록: 현재 직업 스킬 정보'
         );
     },
-    '/내정보': function(player, args, replier, sender, account) {
+    '.내정보': function(player, args, replier, sender, account) {
         var info = '--- 내 정보 ---\n' +
             '🏅 [' + (player.title || '초보 모험가') + ']\n' +
             '• 이름: ' + player.name + ' (' + player.className + ')\n' +
@@ -1688,14 +1728,14 @@ var commandHandlers = {
         }
         replier.reply(info);
     },
-    '/인벤토리': function(player, args, replier, sender, account) {
+    '.인벤토리': function(player, args, replier, sender, account) {
         replier.reply(showInventory(player));
     },
-    '/캐릭터인벤토리': function(player, args, replier, sender, account) {
-        commandHandlers['/인벤토리'](player, args, replier, sender, account);
+    '.캐릭터인벤토리': function(player, args, replier, sender, account) {
+        commandHandlers['.인벤토리'](player, args, replier, sender, account);
     },
-    // [수정] /장비 명령어에 세트 효과 표시 추가
-    '/장비': function(player, args, replier, sender, account) {
+    // [수정] .장비 명령어에 세트 효과 표시 추가
+    '.장비': function(player, args, replier, sender, account) {
         var eq = player.equipment;
         var eqMsg = '--- 장착 장비 (' + player.name + ') ---\n';
         eqMsg += '무기: ' + formatEquipmentDisplay(eq.weapon) + '\n';
@@ -1723,19 +1763,19 @@ var commandHandlers = {
 
         replier.reply(eqMsg.trim());
     },
-    '/사냥': function(player, args, replier, sender, account) {
+    '.사냥': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (player.party) {
             replier.reply("⚠️ 파티에 소속된 동안에는 개인 사냥을 할 수 없습니다.");
             return;
         }
         if (!argString) {
-            replier.reply("⚠️ 사냥할 몬스터 이름을 입력해주세요. 예: /사냥 슬라임");
+            replier.reply("⚠️ 사냥할 몬스터 이름을 입력해주세요. 예: .사냥 슬라임");
             return;
         }
         replier.reply(startBattle(sender, player, argString));
     },
-    '/공격': function(player, args, replier, sender, account) {
+    '.공격': function(player, args, replier, sender, account) {
         var response = null;
         if (battleSession[sender]) {
             response = handleBattleAction(sender);
@@ -1750,7 +1790,7 @@ var commandHandlers = {
             replier.reply(response);
         }
     },
-    '/도망': function(player, args, replier, sender, account) {
+    '.도망': function(player, args, replier, sender, account) {
         if (battleSession[sender]) {
             delete battleSession[sender];
             replier.reply("전투에서 도망쳤습니다.");
@@ -1763,24 +1803,24 @@ var commandHandlers = {
             replier.reply("도망칠 상대가 없습니다.");
         }
     },
-    '/상점': function(player, args, replier, sender, account) {
+    '.상점': function(player, args, replier, sender, account) {
         shopSession[sender] = { category: null };
         var category = args.join(' ').trim();
         if (!category) {
             var msg = '--- 🛒 상점 ---\n현재 골드: ' + player.gold + ' G\n\n📂 카테고리:\n';
             Object.keys(GameData.shopCategories).forEach(function(cat) {
-                msg += ' • /상점 ' + cat + '\n';
+                msg += ' • .상점 ' + cat + '\n';
             });
             msg += '\n📦 명령어:\n';
-            msg += ' • /상점 [카테고리]: 카테고리별 보기\n';
-            msg += ' • /구매 [아이템] [수량]: 아이템 구매\n';
-            msg += ' • /나가기: 상점에서 나가기';
+            msg += ' • .상점 [카테고리]: 카테고리별 보기\n';
+            msg += ' • .구매 [아이템] [수량]: 아이템 구매\n';
+            msg += ' • .나가기: 상점에서 나가기';
             replier.reply(msg);
             return;
         }
         var catInfo = GameData.shopCategories[category];
         if (!catInfo) {
-            replier.reply('⚠️ 존재하지 않는 카테고리입니다. (/상점 으로 카테고리 목록 확인)');
+            replier.reply('⚠️ 존재하지 않는 카테고리입니다. (.상점 으로 카테고리 목록 확인)');
             return;
         }
         shopSession[sender].category = category;
@@ -1798,10 +1838,10 @@ var commandHandlers = {
         if (!hasItems) {
             msg += '판매 중인 아이템이 없습니다.\n';
         }
-        msg += '\n명령어: /구매 [아이템] [수량], /상점, /나가기';
+        msg += '\n명령어: .구매 [아이템] [수량], .상점, .나가기';
         replier.reply(msg);
     },
-    '/구매': function(player, args, replier, sender, account) {
+    '.구매': function(player, args, replier, sender, account) {
         if (args.length === 0) { replier.reply("⚠️ 구매할 아이템 이름을 입력해주세요."); return; }
         var quantity = 1;
         var lastArg = args[args.length - 1];
@@ -1827,7 +1867,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply('🛒 [' + itemName + '] x' + quantity + ' 을(를) ' + totalCost + ' G에 구매했습니다.\n(남은 골드: ' + player.gold + ' G)');
     },
-    '/판매': function(player, args, replier, sender, account) {
+    '.판매': function(player, args, replier, sender, account) {
         var itemName = args.join(' ');
         if (!itemName) { replier.reply("⚠️ 판매할 아이템 이름을 입력해주세요."); return; }
         if (!player.hasItem(itemName)) { replier.reply('⚠️ 해당 아이템을 가지고 있지 않습니다.'); }
@@ -1845,7 +1885,7 @@ var commandHandlers = {
             replier.reply('💰 [' + itemName + '] 을(를) ' + sellPrice + ' G에 판매했습니다.');
         }
     },
-    '/아이템일괄판매': function(player, args, replier, sender, account) {
+    '.아이템일괄판매': function(player, args, replier, sender, account) {
         var totalSellPrice = 0;
         var soldItemsList = [];
         var itemsToKeep = [];
@@ -1876,7 +1916,7 @@ var commandHandlers = {
             replier.reply("⚠️ 판매할 재료 아이템이 없습니다.");
         }
     },
-    '/물고기일괄판매': function(player, args, replier, sender, account) {
+    '.물고기일괄판매': function(player, args, replier, sender, account) {
         if (player.fishInventory.length === 0) {
             replier.reply("⚠️ 판매할 물고기가 없습니다.");
             return;
@@ -1895,7 +1935,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply("🐟 물고기 " + soldFishCount + "마리를 모두 판매하여 총 " + totalSellPrice + " G를 획득했습니다.");
     },
-    '/나가기': function(player, args, replier, sender, account) {
+    '.나가기': function(player, args, replier, sender, account) {
         if (shopSession[sender]) {
             delete shopSession[sender];
             replier.reply('상점에서 나왔습니다.');
@@ -1903,15 +1943,15 @@ var commandHandlers = {
             replier.reply('⚠️ 현재 상점에 있지 않습니다.');
         }
     },
-    '/사용': function(player, args, replier, sender, account) {
+    '.사용': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (!argString) {
-            replier.reply("⚠️ 사용할 아이템 이름을 입력해주세요. 예: /사용 포션");
+            replier.reply("⚠️ 사용할 아이템 이름을 입력해주세요. 예: .사용 포션");
             return;
         }
         // 펫 먹이 사용 로직 추가
         if (argString === '펫 먹이') {
-            commandHandlers['/펫먹이주기'](player, args, replier, sender, account);
+            commandHandlers['.펫먹이주기'](player, args, replier, sender, account);
             return;
         }
         var itemData = GameData.items[argString];
@@ -1935,10 +1975,10 @@ var commandHandlers = {
             replier.reply(effectMsg);
         }
     },
-    '/장착': function(player, args, replier, sender, account) {
+    '.장착': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (!argString) {
-            replier.reply("⚠️ 장착할 아이템 이름을 입력해주세요. 예: /장착 단검");
+            replier.reply("⚠️ 장착할 아이템 이름을 입력해주세요. 예: .장착 단검");
             return;
         }
         var itemData = GameData.items[argString];
@@ -1960,7 +2000,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply('✅ [' + argString + '] 을(를) 장착했습니다.');
     },
-    '/해제': function(player, args, replier, sender, account) {
+    '.해제': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         var slotEng = { '무기': 'weapon', '갑옷': 'armor', '방패': 'shield' }[argString];
         if (!slotEng) {
@@ -1979,7 +2019,7 @@ var commandHandlers = {
             replier.reply('✅ [' + itemName + '] 장착을 해제했습니다.');
         }
     },
-    '/수리': function(player, args, replier, sender, account) {
+    '.수리': function(player, args, replier, sender, account) {
         var part = args[0];
         if (!part) {
             replier.reply("⚠️ 수리할 부위를 입력해주세요. (무기, 갑옷, 방패, 전체)");
@@ -2027,7 +2067,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply("🔧 장비 수리를 완료했습니다. (비용: " + totalCost + " G)");
     },
-    '/퀘스트': function(player, args, replier, sender, account) {
+    '.퀘스트': function(player, args, replier, sender, account) {
         var msg = '--- 퀘스트 목록 ---\n';
         if (Object.keys(player.activeQuests).length === 0) {
             msg += '진행 중인 퀘스트가 없습니다.\n';
@@ -2041,7 +2081,7 @@ var commandHandlers = {
         msg += '-------------------\n' + '수락 가능: ' + Object.keys(GameData.quests).join(', ');
         replier.reply(msg);
     },
-    '/수락': function(player, args, replier, sender, account) {
+    '.수락': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (!argString) {
             replier.reply("⚠️ 수락할 퀘스트 이름을 입력해주세요.");
@@ -2058,7 +2098,7 @@ var commandHandlers = {
             replier.reply('✅ 퀘스트 [' + argString + ']을(를) 수락했습니다.');
         }
     },
-    '/완료': function(player, args, replier, sender, account) {
+    '.완료': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (!argString) {
             replier.reply("⚠️ 완료할 퀘스트 이름을 입력해주세요.");
@@ -2085,7 +2125,7 @@ var commandHandlers = {
             replier.reply(rewardMsg);
         }
     },
-    '/저장': function(player, args, replier, sender, account) {
+    '.저장': function(player, args, replier, sender, account) {
         account.characters[player.className] = player;
         if (saveAccount(sender, account)) {
             replier.reply('💾 데이터를 성공적으로 저장했습니다.');
@@ -2093,7 +2133,7 @@ var commandHandlers = {
             replier.reply('⚠️ 데이터 저장에 실패했습니다.');
         }
     },
-    '/취침': function(player, args, replier, sender, account) {
+    '.취침': function(player, args, replier, sender, account) {
         if (player.party) {
             replier.reply("⚠️ 파티에 소속된 동안에는 휴식을 취할 수 없습니다.");
             return;
@@ -2113,16 +2153,16 @@ var commandHandlers = {
                 delete restSession[sender];
             }
         }, Config.REST_DURATION);
-        replier.reply("휴식을 시작합니다. 5분 후에 HP와 MP가 모두 회복됩니다. (/취침중단 으로 취소)");
+        replier.reply("휴식을 시작합니다. 5분 후에 HP와 MP가 모두 회복됩니다. (.취침중단 으로 취소)");
     },
-    '/취침중단': function(player, args, replier, sender, account) {
+    '.취침중단': function(player, args, replier, sender, account) {
         if (restSession[sender]) {
             clearTimeout(restSession[sender]);
             delete restSession[sender];
             replier.reply("휴식을 중단했습니다.");
         }
     },
-    '/어비스입장': function(player, args, replier, sender, account) {
+    '.어비스입장': function(player, args, replier, sender, account) {
         if (!player.party) {
             replier.reply("⚠️ 어비스 던전은 파티를 맺어야만 입장할 수 있습니다.");
             return;
@@ -2134,13 +2174,13 @@ var commandHandlers = {
         var response = startRaid(sender, replier);
         replier.reply(response);
     },
-    '/어비스공격': function(player, args, replier, sender, account) {
+    '.어비스공격': function(player, args, replier, sender, account) {
         var response = handleRaidAction(sender);
         if (response) {
             replier.reply(response);
         }
     },
-    '/어비스포기': function(player, args, replier, sender, account) {
+    '.어비스포기': function(player, args, replier, sender, account) {
         var leaderSender = player.party;
         var session = raidSession[leaderSender];
         if (!session) {
@@ -2159,10 +2199,10 @@ var commandHandlers = {
         delete raidSession[leaderSender];
         replier.reply("레이드를 포기하고 던전에서 탈출했습니다.");
     },
-    '/몬스터도감': function(player, args, replier, sender, account) {
+    '.몬스터도감': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (!argString) {
-            replier.reply('--- 몬스터 도감 ---\n' + Object.keys(GameData.monsters).join(', ') + '\n\n자세한 정보는 "/몬스터도감 [이름]"을 입력하세요.');
+            replier.reply('--- 몬스터 도감 ---\n' + Object.keys(GameData.monsters).join(', ') + '\n\n자세한 정보는 ".몬스터도감 [이름]"을 입력하세요.');
             return;
         }
         var m = GameData.monsters[argString];
@@ -2178,10 +2218,10 @@ var commandHandlers = {
                 '• 드랍 아이템: ' + m.items.join(', '));
         }
     },
-    '/아이템도감': function(player, args, replier, sender, account) {
+    '.아이템도감': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (!argString) {
-            replier.reply('--- 아이템 도감 ---\n' + Object.keys(GameData.items).join(', ') + '\n\n자세한 정보는 "/아이템도감 [이름]"을 입력하세요.');
+            replier.reply('--- 아이템 도감 ---\n' + Object.keys(GameData.items).join(', ') + '\n\n자세한 정보는 ".아이템도감 [이름]"을 입력하세요.');
             return;
         }
         var i = GameData.items[argString];
@@ -2198,7 +2238,7 @@ var commandHandlers = {
             replier.reply(msg.trim());
         }
     },
-    '/파티생성': function(player, args, replier, sender, account) {
+    '.파티생성': function(player, args, replier, sender, account) {
         if (player.party) {
             replier.reply("⚠️ 이미 다른 파티에 소속되어 있습니다.");
             return;
@@ -2207,9 +2247,9 @@ var commandHandlers = {
         player.party = sender;
         account.characters[player.className] = player;
         saveAccount(sender, account);
-        replier.reply("🎉 파티를 생성했습니다. 다른 플레이어를 초대하려면 /파티초대 [이름] 을 사용하세요.");
+        replier.reply("🎉 파티를 생성했습니다. 다른 플레이어를 초대하려면 .파티초대 [이름] 을 사용하세요.");
     },
-    '/파티초대': function(player, args, replier, sender, account) {
+    '.파티초대': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (!player.party || parties[player.party].leader !== sender) {
             replier.reply("⚠️ 파티장만 다른 플레이어를 초대할 수 있습니다.");
@@ -2234,9 +2274,9 @@ var commandHandlers = {
             return;
         }
         invitations[invitedSender] = sender;
-        replier.reply("✅ " + argString + "님에게 파티 초대를 보냈습니다. 상대방이 /파티수락 으로 응답해야 합니다.");
+        replier.reply("✅ " + argString + "님에게 파티 초대를 보냈습니다. 상대방이 .파티수락 으로 응답해야 합니다.");
     },
-    '/파티수락': function(player, args, replier, sender, account) {
+    '.파티수락': function(player, args, replier, sender, account) {
         var inviterSender = invitations[sender];
         if (!inviterSender) {
             replier.reply("⚠️ 받은 파티 초대가 없습니다.");
@@ -2260,7 +2300,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply("✅ " + players[inviterSender].name + "님의 파티에 참가했습니다.");
     },
-    '/파티거절': function(player, args, replier, sender, account) {
+    '.파티거절': function(player, args, replier, sender, account) {
         var inviterSender = invitations[sender];
         if (!inviterSender) {
             replier.reply("⚠️ 받은 파티 초대가 없습니다.");
@@ -2270,7 +2310,7 @@ var commandHandlers = {
         delete invitations[sender];
         replier.reply("✋ " + inviterName + "님의 파티 초대를 거절했습니다.");
     },
-    '/파티탈퇴': function(player, args, replier, sender, account) {
+    '.파티탈퇴': function(player, args, replier, sender, account) {
         if (!player.party) {
             replier.reply("⚠️ 소속된 파티가 없습니다.");
             return;
@@ -2286,9 +2326,9 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply("파티에서 탈퇴했습니다.");
     },
-    '/파티해산': function(player, args, replier, sender, account) {
+    '.파티해산': function(player, args, replier, sender, account) {
         if (!player.party || parties[player.party].leader !== sender) {
-            replier.reply("⚠️ 파티장이 아니므로 파티를 해산할 수 없습니다. /파티탈퇴 를 이용해주세요.");
+            replier.reply("⚠️ 파티장이 아니므로 파티를 해산할 수 없습니다. .파티탈퇴 를 이용해주세요.");
             return;
         }
         var party = parties[sender];
@@ -2305,7 +2345,7 @@ var commandHandlers = {
         delete parties[sender];
         replier.reply("파티를 해산했습니다.");
     },
-    '/파티정보': function(player, args, replier, sender, account) {
+    '.파티정보': function(player, args, replier, sender, account) {
         if (!player.party) {
             replier.reply("⚠️ 소속된 파티가 없습니다.");
             return;
@@ -2328,7 +2368,7 @@ var commandHandlers = {
         });
         replier.reply(partyInfo.trim());
     },
-    '/낚시': function(player, args, replier, sender, account) {
+    '.낚시': function(player, args, replier, sender, account) {
         var delay = Math.floor(Math.random() * (Config.FISHING_DELAY_MAX - Config.FISHING_DELAY_MIN + 1)) + Config.FISHING_DELAY_MIN;
         fishingSession[sender] = setTimeout(function() {
             if (fishingSession[sender]) {
@@ -2356,16 +2396,16 @@ var commandHandlers = {
                 delete fishingSession[sender];
             }
         }, delay);
-        replier.reply("🎣 낚시를 시작합니다. 잠시 후 자동으로 물고기를 낚습니다... (/낚시중지 로 취소)");
+        replier.reply("🎣 낚시를 시작합니다. 잠시 후 자동으로 물고기를 낚습니다... (.낚시중지 로 취소)");
     },
-    '/낚시중지': function(player, args, replier, sender, account) {
+    '.낚시중지': function(player, args, replier, sender, account) {
         if (fishingSession[sender]) {
             clearTimeout(fishingSession[sender]);
             delete fishingSession[sender];
             replier.reply("낚시를 중단했습니다.");
         }
     },
-    '/수산시장': function(player, args, replier, sender, account) {
+    '.수산시장': function(player, args, replier, sender, account) {
         marketSession[sender] = { map: {} };
         var marketList = "--- 수산시장 ---\n";
         var hasItem = false;
@@ -2382,11 +2422,11 @@ var commandHandlers = {
             });
         });
         if (!hasItem) { marketList += "현재 등록된 물고기가 없습니다.\n"; }
-        marketList += '----------------\n/시장구매 [번호] 로 구매 가능';
+        marketList += '----------------\n.시장구매 [번호] 로 구매 가능';
         replier.reply(marketList);
     },
-    '/시장등록': function(player, args, replier, sender, account) {
-        if (args.length < 3) { replier.reply("⚠️ 사용법: /시장등록 [이름] [크기] [가격]"); return; }
+    '.시장등록': function(player, args, replier, sender, account) {
+        if (args.length < 3) { replier.reply("⚠️ 사용법: .시장등록 [이름] [크기] [가격]"); return; }
         var fishName = args[0]; var fishSize = parseInt(args[1]); var price = parseInt(args[2]);
         if (isNaN(fishSize) || isNaN(price) || price <= 0) { replier.reply("⚠️ 크기와 가격은 0보다 큰 숫자로 입력해주세요."); return; }
         var fishIndex = player.fishInventory.findIndex(function(f) { return f.name === fishName && f.size === fishSize; });
@@ -2399,20 +2439,20 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply('✅ ' + fishName + ' ' + fishSize + 'cm를 ' + price + 'G에 수산시장에 등록했습니다.');
     },
-    '/시장구매': function(player, args, replier, sender, account) {
-        if (args.length < 1) { replier.reply("⚠️ 사용법: /시장구매 [번호]"); return; }
+    '.시장구매': function(player, args, replier, sender, account) {
+        if (args.length < 1) { replier.reply("⚠️ 사용법: .시장구매 [번호]"); return; }
         var itemNumber = parseInt(args[0]);
         if (isNaN(itemNumber) || itemNumber < 1) { replier.reply("⚠️ 번호는 1 이상의 숫자로 입력해주세요."); return; }
         var sessionMap = marketSession[sender] && marketSession[sender].map;
         if (!sessionMap || !sessionMap[itemNumber]) {
-            replier.reply("⚠️ 해당 번호의 판매 정보가 없습니다. /수산시장 명령어로 목록을 다시 확인해주세요.");
+            replier.reply("⚠️ 해당 번호의 판매 정보가 없습니다. .수산시장 명령어로 목록을 다시 확인해주세요.");
             return;
         }
         var purchaseInfo = sessionMap[itemNumber];
         var sellerSender = purchaseInfo.sellerSender;
         var itemIndex = purchaseInfo.itemIndex;
         if (!market[sellerSender] || !market[sellerSender][itemIndex]) {
-            replier.reply("⚠️ 해당 아이템은 이미 판매되었거나 등록이 취소되었습니다. /수산시장 명령어로 목록을 다시 확인해주세요.");
+            replier.reply("⚠️ 해당 아이템은 이미 판매되었거나 등록이 취소되었습니다. .수산시장 명령어로 목록을 다시 확인해주세요.");
             return;
         }
         var fishToBuy = market[sellerSender][itemIndex];
@@ -2435,10 +2475,10 @@ var commandHandlers = {
         delete marketSession[sender].map[itemNumber];
         replier.reply('✅ ' + sellerPlayer.name + '님으로부터 ' + fishToBuy.name + ' ' + fishToBuy.size + 'cm를 ' + fishToBuy.price + 'G에 구매했습니다.');
     },
-    '/상자열기': function(player, args, replier, sender, account) {
+    '.상자열기': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (!argString) {
-            replier.reply("⚠️ 열고 싶은 상자 이름을 입력해주세요. (예: /상자열기 낡은 보물상자)");
+            replier.reply("⚠️ 열고 싶은 상자 이름을 입력해주세요. (예: .상자열기 낡은 보물상자)");
             return;
         }
         var boxData = GameData.treasureBoxes[argString];
@@ -2465,7 +2505,7 @@ var commandHandlers = {
             replier.reply("알 수 없는 오류로 보물상자를 열 수 없습니다.");
         }
     },
-    '/조합법': function(player, args, replier, sender, account) {
+    '.조합법': function(player, args, replier, sender, account) {
         var msg = "--- 아이템 조합법 ---\n";
         for (var itemName in GameData.combinationRecipes) {
             var recipe = GameData.combinationRecipes[itemName];
@@ -2474,13 +2514,13 @@ var commandHandlers = {
                 msg += "    └ 재료: " + mat.name + " x" + mat.count + "\n";
             });
         }
-        msg += "--------------------\n/조합 [아이템이름] 으로 제작";
+        msg += "--------------------\n.조합 [아이템이름] 으로 제작";
         replier.reply(msg);
     },
-    '/조합': function(player, args, replier, sender, account) {
+    '.조합': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (!argString) {
-            replier.reply("⚠️ 조합할 아이템 이름을 입력해주세요. /조합법 으로 목록 확인");
+            replier.reply("⚠️ 조합할 아이템 이름을 입력해주세요. .조합법 으로 목록 확인");
             return;
         }
         var recipe = GameData.combinationRecipes[argString];
@@ -2496,7 +2536,7 @@ var commandHandlers = {
             return player.hasItem(mat.name, mat.count);
         });
         if (!canCraft) {
-            replier.reply("⚠️ 재료가 부족합니다. /조합법 을 다시 확인해주세요.");
+            replier.reply("⚠️ 재료가 부족합니다. .조합법 을 다시 확인해주세요.");
             return;
         }
         player.gold -= recipe.cost;
@@ -2509,7 +2549,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply("🛠️ [" + recipe.result.name + "] " + recipe.result.count + "개 조합에 성공했습니다!");
     },
-    '/요리법': function(player, args, replier, sender, account) {
+    '.요리법': function(player, args, replier, sender, account) {
         var msg = "--- 요리법 ---\n";
         for (var recipeName in GameData.cookingRecipes) {
             var recipe = GameData.cookingRecipes[recipeName];
@@ -2517,13 +2557,13 @@ var commandHandlers = {
             msg += " • [" + recipeName + "] (비용: " + recipe.cost + "G) - " + itemInfo.description + "\n";
             msg += "    └ 재료: " + recipe.fish.name + " x" + recipe.fish.count + "\n";
         }
-        msg += "--------------------\n/요리 [요리이름] 으로 제작";
+        msg += "--------------------\n.요리 [요리이름] 으로 제작";
         replier.reply(msg);
     },
-    '/요리': function(player, args, replier, sender, account) {
+    '.요리': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (!argString) {
-            replier.reply("⚠️ 요리할 음식 이름을 입력해주세요. /요리법 으로 목록 확인");
+            replier.reply("⚠️ 요리할 음식 이름을 입력해주세요. .요리법 으로 목록 확인");
             return;
         }
         var recipe = GameData.cookingRecipes[argString];
@@ -2546,7 +2586,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply("🍳 [" + recipe.result.name + "] " + recipe.result.count + "개 요리를 완성했습니다!");
     },
-    '/거래신청': function(player, args, replier, sender, account) {
+    '.거래신청': function(player, args, replier, sender, account) {
         var targetName = args.join(' ');
         if (!targetName) { replier.reply("⚠️ 거래를 신청할 플레이어의 이름을 입력해주세요."); return; }
         if (targetName === player.name) { replier.reply("⚠️ 자기 자신과는 거래할 수 없습니다."); return; }
@@ -2554,9 +2594,9 @@ var commandHandlers = {
         if (!targetSender) { replier.reply("⚠️ '" + targetName + "' 플레이어를 찾을 수 없거나 오프라인 상태입니다."); return; }
         if (tradeRequests[targetSender] || tradeSessions[targetSender]) { replier.reply("⚠️ 상대방은 지금 다른 거래를 하거나 요청을 받는 중입니다."); return; }
         tradeRequests[targetSender] = sender;
-        replier.reply("✅ " + targetName + "님에게 거래를 신청했습니다. 상대방이 /거래수락 또는 /거래거절 로 응답해야 합니다.");
+        replier.reply("✅ " + targetName + "님에게 거래를 신청했습니다. 상대방이 .거래수락 또는 .거래거절 로 응답해야 합니다.");
     },
-    '/거래수락': function(player, args, replier, sender, account) {
+    '.거래수락': function(player, args, replier, sender, account) {
         var requesterSender = tradeRequests[sender];
         if (!requesterSender) { replier.reply("⚠️ 받은 거래 신청이 없습니다."); return; }
         var requesterPlayer = players[requesterSender];
@@ -2575,18 +2615,18 @@ var commandHandlers = {
         delete tradeRequests[sender];
         replier.reply("✅ " + requesterPlayer.name + "님과의 거래를 시작합니다.\n" + getTradeStatus(tradeSessions[sessionId]));
     },
-    '/거래거절': function(player, args, replier, sender, account) {
+    '.거래거절': function(player, args, replier, sender, account) {
         var requesterSender = tradeRequests[sender];
         if (!requesterSender) { replier.reply("⚠️ 받은 거래 신청이 없습니다."); return; }
         delete tradeRequests[sender];
         replier.reply("거래 신청을 거절했습니다.");
     },
-    '/거래취소': function(player, args, replier, sender, account) {
+    '.거래취소': function(player, args, replier, sender, account) {
         var sessionId = tradeSessions[sender];
         if (!sessionId) { replier.reply("⚠️ 거래 중이 아닙니다."); return; }
         endTrade(sessionId, replier, "거래가 취소되었습니다.");
     },
-    '/거래올리기': function(player, args, replier, sender, account) {
+    '.거래올리기': function(player, args, replier, sender, account) {
         var sessionId = tradeSessions[sender];
         if (!sessionId) { replier.reply("⚠️ 거래 중이 아닙니다."); return; }
         var count = parseInt(args[args.length - 1]);
@@ -2613,7 +2653,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply(getTradeStatus(session));
     },
-    '/거래골드': function(player, args, replier, sender, account) {
+    '.거래골드': function(player, args, replier, sender, account) {
         var sessionId = tradeSessions[sender];
         if (!sessionId) { replier.reply("⚠️ 거래 중이 아닙니다."); return; }
         var amount = parseInt(args.join(' '));
@@ -2629,7 +2669,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply(getTradeStatus(session));
     },
-    '/거래확인': function(player, args, replier, sender, account) {
+    '.거래확인': function(player, args, replier, sender, account) {
         var sessionId = tradeSessions[sender];
         if (!sessionId) { replier.reply("⚠️ 거래 중이 아닙니다."); return; }
         var session = tradeSessions[sessionId];
@@ -2660,7 +2700,7 @@ var commandHandlers = {
             replier.reply("✅ 거래 내용을 확인했습니다. 상대방이 확인할 때까지 기다려주세요.\n" + getTradeStatus(session));
         }
     },
-    '/로또': function(player, args, replier, sender, account) {
+    '.로또': function(player, args, replier, sender, account) {
         var totalTickets = 0;
         for (var p in lottoData.tickets) {
             totalTickets += lottoData.tickets[p];
@@ -2671,16 +2711,16 @@ var commandHandlers = {
             ' • 총 판매된 티켓 수: ' + totalTickets + ' 장\n' +
             ' • 내 구매 수: ' + (lottoData.tickets[sender] || 0) + ' 장\n' +
             '--------------------------\n' +
-            ' • /로또구매 [수량]: 로또 티켓 구매\n' +
-            ' • /로또확인: 내 티켓 수 확인\n' +
-            ' • /로또추첨: 당첨자 추첨 (1시간마다 가능)';
+            ' • .로또구매 [수량]: 로또 티켓 구매\n' +
+            ' • .로또확인: 내 티켓 수 확인\n' +
+            ' • .로또추첨: 당첨자 추첨 (1시간마다 가능)';
         if (lottoData.lastWinner) {
             var winnerName = lottoData.lastWinner.name || '(알수없음)';
             msg += '\n • 지난 회차 당첨자: ' + winnerName + ' (' + lottoData.lastWinner.pot + ' G)';
         }
         replier.reply(msg);
     },
-    '/로또구매': function(player, args, replier, sender, account) {
+    '.로또구매': function(player, args, replier, sender, account) {
         var count = parseInt(args[0]) || 1;
         if (isNaN(count) || count <= 0) {
             replier.reply("⚠️ 구매할 티켓 수량을 정확히 입력해주세요.");
@@ -2699,10 +2739,10 @@ var commandHandlers = {
         saveData(Config.LOTTO_DATA_FILE, lottoData);
         replier.reply("✅ 로또 티켓 " + count + "장을 구매했습니다. 행운을 빌어요!\n(현재 내 티켓: " + lottoData.tickets[sender] + "장)");
     },
-    '/로또확인': function(player, args, replier, sender, account) {
+    '.로또확인': function(player, args, replier, sender, account) {
         replier.reply("🍀 내가 구매한 로또 티켓은 총 " + (lottoData.tickets[sender] || 0) + "장 입니다.");
     },
-    '/로또추첨': function(player, args, replier, sender, account) {
+    '.로또추첨': function(player, args, replier, sender, account) {
         var now = new Date().getTime();
         if (lottoData.lastDrawTime && (now - lottoData.lastDrawTime < Config.LOTTO_DRAW_INTERVAL)) {
             var remaining = Math.ceil((lottoData.lastDrawTime + Config.LOTTO_DRAW_INTERVAL - now) / (60 * 1000));
@@ -2736,7 +2776,7 @@ var commandHandlers = {
         lottoData.lastDrawTime = now;
         saveData(Config.LOTTO_DATA_FILE, lottoData);
     },
-    '/랭킹': function(player, args, replier, sender, account) {
+    '.랭킹': function(player, args, replier, sender, account) {
         var now = Date.now();
         if (now - lastRankingUpdateTime > Config.RANKING_CACHE_DURATION) {
             updateRankingCache();
@@ -2751,7 +2791,7 @@ var commandHandlers = {
         });
         replier.reply(rankList.trim());
     },
-    '/내캐릭터': function(player, args, replier, sender, account) {
+    '.내캐릭터': function(player, args, replier, sender, account) {
         var msg = "--- 내 캐릭터 목록 ---\n";
         var charList = Object.keys(account.characters);
         if (charList.length === 0) {
@@ -2765,10 +2805,10 @@ var commandHandlers = {
         }
         replier.reply(msg.trim());
     },
-    '/캐릭터변경': function(player, args, replier, sender, account) {
+    '.캐릭터변경': function(player, args, replier, sender, account) {
         var targetClass = args[0];
         if (!targetClass) {
-            replier.reply("⚠️ 변경할 캐릭터의 직업을 입력해주세요. 예: /캐릭터변경 마법사");
+            replier.reply("⚠️ 변경할 캐릭터의 직업을 입력해주세요. 예: .캐릭터변경 마법사");
             return;
         }
         if (!account.characters[targetClass]) {
@@ -2785,7 +2825,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply("✅ 캐릭터를 '" + players[sender].name + "' (" + targetClass + ")(으)로 변경했습니다.");
     },
-    '/전쟁모드': function(player, args, replier, sender, account) {
+    '.전쟁모드': function(player, args, replier, sender, account) {
         player.warMode = !player.warMode;
         account.characters[player.className] = player;
         saveAccount(sender, account);
@@ -2795,14 +2835,14 @@ var commandHandlers = {
             replier.reply("🛡️ 전쟁 모드가 비활성화되었습니다.");
         }
     },
-    '/pk': function(player, args, replier, sender, account) {
+    '.pk': function(player, args, replier, sender, account) {
         var targetName = args.join(' ');
         if (!targetName) {
             replier.reply("⚠️ 대결할 상대방의 이름을 입력해주세요.");
             return;
         }
         if (!player.warMode) {
-            replier.reply("⚠️ 전쟁 모드를 먼저 활성화해야 합니다. (/전쟁모드)");
+            replier.reply("⚠️ 전쟁 모드를 먼저 활성화해야 합니다. (.전쟁모드)");
             return;
         }
         var targetSender = findSenderByName(targetName);
@@ -2832,7 +2872,7 @@ var commandHandlers = {
         pvpSession[targetSender] = session;
         replier.reply(getPvpStatus(sender));
     },
-    '/힐': function(player, args, replier, sender, account) {
+    '.힐': function(player, args, replier, sender, account) {
         if (player.className !== '힐러') {
             replier.reply("⚠️ 힐러만 사용할 수 있는 스킬입니다.");
             return;
@@ -2868,7 +2908,7 @@ var commandHandlers = {
         saveAccount(targetSender, targetAccount);
         replier.reply("💚 " + targetPlayer.name + "님의 HP를 " + healedAmount + "만큼 회복시켰습니다. (남은 MP: " + player.mp + ")");
     },
-    '/강타': function(player, args, replier, sender, account) {
+    '.강타': function(player, args, replier, sender, account) {
         var currentClassInfo = GameData.classes[player.className];
         if (!currentClassInfo || !currentClassInfo.skills['강타']) {
              replier.reply("⚠️ 현재 직업은 사용할 수 없는 스킬입니다.");
@@ -2902,7 +2942,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply(response);
     },
-    '/파이어볼': function(player, args, replier, sender, account) {
+    '.파이어볼': function(player, args, replier, sender, account) {
         var currentClassInfo = GameData.classes[player.className];
         if (!currentClassInfo || !currentClassInfo.skills['파이어볼']) {
              replier.reply("⚠️ 현재 직업은 사용할 수 없는 스킬입니다.");
@@ -2936,7 +2976,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply(response);
     },
-    '/독바르기': function(player, args, replier, sender, account) {
+    '.독바르기': function(player, args, replier, sender, account) {
         var currentClassInfo = GameData.classes[player.className];
         if (!currentClassInfo || !currentClassInfo.skills['독바르기']) {
              replier.reply("⚠️ 현재 직업은 사용할 수 없는 스킬입니다.");
@@ -2957,7 +2997,7 @@ var commandHandlers = {
         replier.reply("🗡️ 무기에 맹독을 발랐습니다. 5분간 공격 시 추가 데미지를 줍니다.");
     },
 
-  '/분노폭발': function(player, args, replier, sender, account) {
+  '.분노폭발': function(player, args, replier, sender, account) {
     var currentClassInfo = GameData.classes[player.className];
     if (!currentClassInfo || !currentClassInfo.skills['분노폭발']) {
       replier.reply("⚠️ 버서커만 사용할 수 있는 스킬입니다.");
@@ -2975,7 +3015,7 @@ var commandHandlers = {
     saveAccount(sender, account);
     replier.reply("💢 분노폭발! 5분간 공격력 +30%, 방어력 -10%! 미친듯한 광기가 솟구칩니다!");
   },
-  '/신성한방패': function(player, args, replier, sender, account) {
+  '.신성한방패': function(player, args, replier, sender, account) {
     var currentClassInfo = GameData.classes[player.className];
     if (!currentClassInfo || !currentClassInfo.skills['신성한 방패']) {
       replier.reply("⚠️ 팔라딘만 사용할 수 있는 스킬입니다.");
@@ -3009,7 +3049,7 @@ var commandHandlers = {
     saveAccount(sender, account);
     replier.reply("🛡️ 신성한 방패의 빛이 감쌉니다! 5분간 방어력 +20%\n적용 대상: " + buffedNames.join(', '));
   },
-  '/메테오': function(player, args, replier, sender, account) {
+  '.메테오': function(player, args, replier, sender, account) {
     var currentClassInfo = GameData.classes[player.className];
     if (!currentClassInfo || !currentClassInfo.skills['메테오']) {
       replier.reply("⚠️ 아크메이지만 사용할 수 있는 스킬입니다.");
@@ -3048,7 +3088,7 @@ var commandHandlers = {
     saveAccount(sender, account);
     if (response) replier.reply(response);
   },
-  '/골렘소환': function(player, args, replier, sender, account) {
+  '.골렘소환': function(player, args, replier, sender, account) {
     var currentClassInfo = GameData.classes[player.className];
     if (!currentClassInfo || !currentClassInfo.skills['골렘소환']) {
       replier.reply("⚠️ 서모너만 사용할 수 있는 스킬입니다.");
@@ -3068,7 +3108,7 @@ var commandHandlers = {
     saveAccount(sender, account);
     replier.reply("🗿 작은 골렘을 소환했습니다! 10분간 전투 시 추가 데미지(+50)를 줍니다.");
   },
-  '/암살': function(player, args, replier, sender, account) {
+  '.암살': function(player, args, replier, sender, account) {
     var currentClassInfo = GameData.classes[player.className];
     if (!currentClassInfo || !currentClassInfo.skills['암살']) {
       replier.reply("⚠️ 어쌔신만 사용할 수 있는 스킬입니다.");
@@ -3104,7 +3144,7 @@ var commandHandlers = {
     saveAccount(sender, account);
     if (response) replier.reply(response);
   },
-  '/훔치기': function(player, args, replier, sender, account) {
+  '.훔치기': function(player, args, replier, sender, account) {
     var currentClassInfo = GameData.classes[player.className];
     if (!currentClassInfo || !currentClassInfo.skills['훔치기']) {
       replier.reply("⚠️ 로그만 사용할 수 있는 스킬입니다.");
@@ -3128,7 +3168,7 @@ var commandHandlers = {
     saveAccount(sender, account);
     replier.reply("🪙 " + session.monster.name + "에게서 " + stolenGold + " G를 훔쳤습니다! (현재 골드: " + player.gold + " G)");
   },
-  '/부활': function(player, args, replier, sender, account) {
+  '.부활': function(player, args, replier, sender, account) {
     var currentClassInfo = GameData.classes[player.className];
     if (!currentClassInfo || !currentClassInfo.skills['부활']) {
       replier.reply("⚠️ 프리스트만 사용할 수 있는 스킬입니다.");
@@ -3136,7 +3176,7 @@ var commandHandlers = {
     }
     var targetName = args.join(' ');
     if (!targetName) {
-      replier.reply("⚠️ 부활시킬 대상의 이름을 입력해주세요. 예: /부활 묘냥");
+      replier.reply("⚠️ 부활시킬 대상의 이름을 입력해주세요. 예: .부활 묘냥");
       return;
     }
     var skill = currentClassInfo.skills['부활'];
@@ -3170,7 +3210,7 @@ var commandHandlers = {
     saveAccount(targetSender, targetAccount);
     replier.reply("🌟 신성한 빛으로 [" + targetPlayer.name + "]을(를) 부활시켰습니다! (HP " + targetPlayer.hp + " 회복)");
   },
-  '/아수라파천무': function(player, args, replier, sender, account) {
+  '.아수라파천무': function(player, args, replier, sender, account) {
     var currentClassInfo = GameData.classes[player.className];
     if (!currentClassInfo || !currentClassInfo.skills['아수라파천무']) {
       replier.reply("⚠️ 몽크만 사용할 수 있는 스킬입니다.");
@@ -3214,7 +3254,7 @@ var commandHandlers = {
 
     // --- [신규] 전직, 펫 진화 명령어 ---
 
-    '/전직': function(player, args, replier, sender, account) {
+    '.전직': function(player, args, replier, sender, account) {
         var currentClassInfo = GameData.classes[player.className];
         if (player.jobTier !== 1) {
             return replier.reply("⚠️ 이미 전직을 완료했습니다.");
@@ -3236,7 +3276,7 @@ var commandHandlers = {
             var jobList = Object.keys(nextJobs).map(function(job) {
                 return job + ' (' + nextJobs[job] + ')';
             }).join(', ');
-            return replier.reply("⚠️ 전직할 직업을 선택해주세요.\n사용법: /전직 [직업이름]\n선택 가능: " + jobList);
+            return replier.reply("⚠️ 전직할 직업을 선택해주세요.\n사용법: .전직 [직업이름]\n선택 가능: " + jobList);
         }
 
         // 1. 전직 아이템 소모
@@ -3266,7 +3306,7 @@ var commandHandlers = {
         replier.reply("🎉축하합니다! 성공적으로 [" + targetJob + "](으)로 전직했습니다!🎉\n새로운 능력과 스킬을 확인해보세요!");
     },
 
-    '/펫진화': function(player, args, replier, sender, account) {
+    '.펫진화': function(player, args, replier, sender, account) {
         var pet = account.pet;
         if (!pet) {
             return replier.reply("⚠️ 진화시킬 펫이 없습니다.");
@@ -3312,7 +3352,7 @@ var commandHandlers = {
     },
 
 
-    '/스킬목록': function(player, args, replier, sender, account) {
+    '.스킬목록': function(player, args, replier, sender, account) {
         var classInfo = GameData.classes[player.className];
         if (!classInfo || !classInfo.skills) {
             replier.reply("⚠️ 현재 직업의 스킬 정보를 찾을 수 없습니다.");
@@ -3328,28 +3368,28 @@ var commandHandlers = {
                 msg += '• [' + skillName + '] (MP ' + s.mpCost + ')\n';
                 msg += '   ' + (s.description || '설명 없음') + '\n';
             });
-            msg += '\n💡 명령어: /' + skillKeys[0].replace(/ /g, '');
+            msg += '\n💡 명령어: .' + skillKeys[0].replace(/ /g, '');
             if (skillKeys.length > 1) msg += ' 등';
         }
         if (player.jobTier === 1) {
-            msg += '\n\n👀 50레벨 달성 + 영웅의 길 퀘스트 완료 시 /전직 가능!';
+            msg += '\n\n👀 50레벨 달성 + 영웅의 길 퀘스트 완료 시 .전직 가능!';
         }
         replier.reply(msg);
     },
 
     // --- 펫 시스템 명령어 ---
-    '/펫': function(player, args, replier, sender, account) {
+    '.펫': function(player, args, replier, sender, account) {
         replier.reply(
             '--- 🐾 펫 명령어 🐾 ---\n' +
-            ' • /펫정보: 내 펫의 상태를 확인합니다.\n' +
-            ' • /펫알부화: 펫 알을 부화시켜 새로운 펫을 얻습니다.\n' +
-            ' • /펫먹이주기: 펫에게 먹이를 주어 성장시킵니다.\n' +
-            ' • /펫동행: 펫과 함께 다니거나 쉬게 합니다.\n' +
-            ' • /펫이름변경 [새이름]: 펫의 이름을 변경합니다.\n' +
-            ' • /펫진화: 펫을 다음 단계로 진화시킵니다.'
+            ' • .펫정보: 내 펫의 상태를 확인합니다.\n' +
+            ' • .펫알부화: 펫 알을 부화시켜 새로운 펫을 얻습니다.\n' +
+            ' • .펫먹이주기: 펫에게 먹이를 주어 성장시킵니다.\n' +
+            ' • .펫동행: 펫과 함께 다니거나 쉬게 합니다.\n' +
+            ' • .펫이름변경 [새이름]: 펫의 이름을 변경합니다.\n' +
+            ' • .펫진화: 펫을 다음 단계로 진화시킵니다.'
         );
     },
-    '/펫알부화': function(player, args, replier, sender, account) {
+    '.펫알부화': function(player, args, replier, sender, account) {
         if (account.pet) {
             replier.reply("⚠️ 이미 펫을 보유하고 있습니다. 한 번에 한 마리의 펫만 키울 수 있습니다.");
             return;
@@ -3381,12 +3421,12 @@ var commandHandlers = {
         account.characters[player.className] = player;
         saveAccount(sender, account);
 
-        replier.reply("🎉 펫 알에서 [" + newPetType + "]이(가) 부화했습니다! /펫정보 명령어로 확인해보세요!");
+        replier.reply("🎉 펫 알에서 [" + newPetType + "]이(가) 부화했습니다! .펫정보 명령어로 확인해보세요!");
     },
-    '/펫정보': function(player, args, replier, sender, account) {
+    '.펫정보': function(player, args, replier, sender, account) {
         var pet = account.pet;
         if (!pet) {
-            replier.reply("⚠️ 보유한 펫이 없습니다. /펫알부화 명령어로 펫을 얻어보세요.");
+            replier.reply("⚠️ 보유한 펫이 없습니다. .펫알부화 명령어로 펫을 얻어보세요.");
             return;
         }
 
@@ -3409,7 +3449,7 @@ var commandHandlers = {
 
         replier.reply(msg);
     },
-    '/펫먹이주기': function(player, args, replier, sender, account) {
+    '.펫먹이주기': function(player, args, replier, sender, account) {
         var pet = account.pet;
         if (!pet) {
             replier.reply("⚠️ 먹이를 줄 펫이 없습니다.");
@@ -3431,7 +3471,7 @@ var commandHandlers = {
         var replyMsg = "펫 [" + pet.name + "]에게 먹이를 주었습니다. 친밀도가 5 올랐습니다.\n" + levelUpMsg;
         replier.reply(replyMsg);
     },
-    '/펫동행': function(player, args, replier, sender, account) {
+    '.펫동행': function(player, args, replier, sender, account) {
         var pet = account.pet;
         if (!pet) {
             replier.reply("⚠️ 함께할 펫이 없습니다.");
@@ -3445,7 +3485,7 @@ var commandHandlers = {
             replier.reply("✅ [" + pet.name + "]이(가) 휴식을 시작합니다.");
         }
     },
-    '/펫이름변경': function(player, args, replier, sender, account) {
+    '.펫이름변경': function(player, args, replier, sender, account) {
         var pet = account.pet;
         if (!pet) {
             replier.reply("⚠️ 이름을 변경할 펫이 없습니다.");
@@ -3453,7 +3493,7 @@ var commandHandlers = {
         }
         var newName = args.join(' ');
         if (!newName) {
-            replier.reply("⚠️ 변경할 펫의 이름을 입력해주세요. 예: /펫이름변경 용용이");
+            replier.reply("⚠️ 변경할 펫의 이름을 입력해주세요. 예: .펫이름변경 용용이");
             return;
         }
         if (newName.length > 10) {
@@ -3467,9 +3507,9 @@ var commandHandlers = {
     },
 
     // --- [신규] 튜토리얼 시스템 ---
-    '/튜토리얼': function(player, args, replier, sender, account) {
+    '.튜토리얼': function(player, args, replier, sender, account) {
         if (player.tutorialCompleted) {
-            replier.reply("✨ 이미 튜토리얼을 완료한 모험가입니다!\n다시 시작하려면 /튜토리얼재시작 을 입력하세요.");
+            replier.reply("✨ 이미 튜토리얼을 완료한 모험가입니다!\n다시 시작하려면 .튜토리얼재시작 을 입력하세요.");
             return;
         }
         if (!player.tutorialStep || player.tutorialStep === 0) {
@@ -3484,7 +3524,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply('--- 📖 튜토리얼 (' + player.tutorialStep + '/' + TUTORIAL_STEPS.length + ') ---\n[' + step.title + ']\n\n' + step.message);
     },
-    '/튜토리얼다음': function(player, args, replier, sender, account) {
+    '.튜토리얼다음': function(player, args, replier, sender, account) {
         if (player.tutorialCompleted) {
             replier.reply("✨ 이미 튜토리얼을 완료했습니다.");
             return;
@@ -3498,7 +3538,7 @@ var commandHandlers = {
             player.addItem('마나 포션', 5);
             account.characters[player.className] = player;
             saveAccount(sender, account);
-            replier.reply('🎉 튜토리얼 완료!\n보상: 1000 G, 포션 10개, 마나 포션 5개\n이제 본격적인 모험을 즐겨보세요! /명령어 로 모든 명령어를 확인할 수 있습니다.');
+            replier.reply('🎉 튜토리얼 완료!\n보상: 1000 G, 포션 10개, 마나 포션 5개\n이제 본격적인 모험을 즐겨보세요! .명령어 로 모든 명령어를 확인할 수 있습니다.');
             return;
         }
         var step = getTutorialMessage(player.tutorialStep);
@@ -3510,7 +3550,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply('--- 📖 튜토리얼 (' + player.tutorialStep + '/' + TUTORIAL_STEPS.length + ') ---\n[' + step.title + ']\n\n' + step.message);
     },
-    '/튜토리얼완료': function(player, args, replier, sender, account) {
+    '.튜토리얼완료': function(player, args, replier, sender, account) {
         if (player.tutorialCompleted) {
             replier.reply("✨ 이미 튜토리얼을 완료했습니다.");
             return;
@@ -3520,9 +3560,9 @@ var commandHandlers = {
         player.gold += 500;
         account.characters[player.className] = player;
         saveAccount(sender, account);
-        replier.reply('✅ 튜토리얼을 종료합니다. (보상: 500 G)\n언제든 /튜토리얼재시작 으로 다시 볼 수 있습니다.');
+        replier.reply('✅ 튜토리얼을 종료합니다. (보상: 500 G)\n언제든 .튜토리얼재시작 으로 다시 볼 수 있습니다.');
     },
-    '/튜토리얼재시작': function(player, args, replier, sender, account) {
+    '.튜토리얼재시작': function(player, args, replier, sender, account) {
         player.tutorialStep = 1;
         player.tutorialCompleted = false;
         account.characters[player.className] = player;
@@ -3532,7 +3572,7 @@ var commandHandlers = {
     },
 
     // --- [신규] 출석 체크 시스템 ---
-    '/출석': function(player, args, replier, sender, account) {
+    '.출석': function(player, args, replier, sender, account) {
         var todayStr = new Date().toISOString().slice(0, 10);
         if (player.lastAttendance === todayStr) {
             replier.reply('⚠️ 오늘은 이미 출석체크를 했습니다. (현재 연속 출석: ' + player.attendanceStreak + '일)');
@@ -3576,7 +3616,7 @@ var commandHandlers = {
     },
 
     // --- [신규] 일일 퀘스트 시스템 ---
-    '/일일퀘스트': function(player, args, replier, sender, account) {
+    '.일일퀘스트': function(player, args, replier, sender, account) {
         var refreshed = refreshDailyQuests(player);
         var msg = '--- 📅 일일 퀘스트 (' + player.dailyQuests.date + ') ---\n';
         if (refreshed) msg += '🔔 새로운 일일 퀘스트가 도착했습니다!\n\n';
@@ -3594,20 +3634,20 @@ var commandHandlers = {
                 msg += '   ' + qData.description + '\n';
                 msg += '   보상: ' + qData.reward.gold + ' G, ' + qData.reward.exp + ' EXP\n';
             });
-            msg += '\n명령어: /일일보상 [퀘스트이름] - 완료된 퀘스트 보상 수령';
+            msg += '\n명령어: .일일보상 [퀘스트이름] - 완료된 퀘스트 보상 수령';
         }
         account.characters[player.className] = player;
         saveAccount(sender, account);
         replier.reply(msg);
     },
-    '/일일보상': function(player, args, replier, sender, account) {
+    '.일일보상': function(player, args, replier, sender, account) {
         var name = args.join(' ');
         if (!name) {
-            replier.reply('⚠️ 보상을 받을 일일 퀘스트 이름을 입력해주세요. 예: /일일보상 슬라임 토벌');
+            replier.reply('⚠️ 보상을 받을 일일 퀘스트 이름을 입력해주세요. 예: .일일보상 슬라임 토벌');
             return;
         }
         if (!player.dailyQuests || !player.dailyQuests.quests) {
-            replier.reply('⚠️ 진행 중인 일일 퀘스트가 없습니다. /일일퀘스트 로 확인하세요.');
+            replier.reply('⚠️ 진행 중인 일일 퀘스트가 없습니다. .일일퀘스트 로 확인하세요.');
             return;
         }
         var targetQ = null;
@@ -3653,7 +3693,7 @@ var commandHandlers = {
     },
 
     // --- [신규] 업적 시스템 ---
-    '/업적': function(player, args, replier, sender, account) {
+    '.업적': function(player, args, replier, sender, account) {
         var unlockedCount = Object.keys(player.achievements || {}).length;
         var totalCount = Object.keys(GameData.achievements).length;
         var msg = '--- 🏆 업적 (' + unlockedCount + '/' + totalCount + ') ---\n';
@@ -3676,7 +3716,7 @@ var commandHandlers = {
     },
 
     // --- [신규] 칭호 변경 ---
-    '/칭호': function(player, args, replier, sender, account) {
+    '.칭호': function(player, args, replier, sender, account) {
         var titleMsg = updateTitle(player);
         var msg = '--- 🏅 내 칭호 ---\n현재 칭호: [' + (player.title || '초보 모험가') + ']\n\n--- 칭호 목록 ---\n';
         Object.keys(GameData.titles).forEach(function(t) {
@@ -3693,10 +3733,10 @@ var commandHandlers = {
     },
 
     // --- [신규] 상자 일괄 열기 ---
-    '/상자일괄열기': function(player, args, replier, sender, account) {
+    '.상자일괄열기': function(player, args, replier, sender, account) {
         var argString = args.join(' ');
         if (!argString) {
-            replier.reply('⚠️ 일괄 열고 싶은 상자 이름을 입력해주세요. 예: /상자일괄열기 낡은 보물상자');
+            replier.reply('⚠️ 일괄 열고 싶은 상자 이름을 입력해주세요. 예: .상자일괄열기 낡은 보물상자');
             return;
         }
         var boxData = GameData.treasureBoxes[argString];
@@ -3737,7 +3777,7 @@ var commandHandlers = {
     },
 
     // --- [신규] 파티 채팅 ---
-    '/파티챗': function(player, args, replier, sender, account) {
+    '.파티챗': function(player, args, replier, sender, account) {
         var msg = args.join(' ');
         if (!msg) {
             replier.reply('⚠️ 파티원에게 보낼 메시지를 입력하세요.');
@@ -3762,7 +3802,7 @@ var commandHandlers = {
     },
 
     // --- [신규] PvP 랭킹 ---
-    '/pvp랭킹': function(player, args, replier, sender, account) {
+    '.pvp랭킹': function(player, args, replier, sender, account) {
         var allChars = [];
         var files = dataFolder.listFiles();
         if (files) {
@@ -3795,7 +3835,7 @@ var commandHandlers = {
         }
         replier.reply(msg.trim());
     },
-    '/pvp전적': function(player, args, replier, sender, account) {
+    '.pvp전적': function(player, args, replier, sender, account) {
         var stats = player.pvpStats || { wins: 0, losses: 0 };
         var total = stats.wins + stats.losses;
         var rate = total > 0 ? Math.floor((stats.wins / total) * 100) : 0;
@@ -3807,9 +3847,9 @@ var commandHandlers = {
     },
 
     // --- [신규] 골드 송금 ---
-    '/송금': function(player, args, replier, sender, account) {
+    '.송금': function(player, args, replier, sender, account) {
         if (args.length < 2) {
-            replier.reply('⚠️ 사용법: /송금 [받는사람이름] [금액]');
+            replier.reply('⚠️ 사용법: .송금 [받는사람이름] [금액]');
             return;
         }
         var amount = parseInt(args[args.length - 1]);
@@ -3845,7 +3885,7 @@ var commandHandlers = {
     },
 
     // --- [신규] 이벤트 / 통계 ---
-    '/통계': function(player, args, replier, sender, account) {
+    '.통계': function(player, args, replier, sender, account) {
         var totalKills = (player.killCount && player.killCount.total) || 0;
         var pvpStats = player.pvpStats || { wins: 0, losses: 0 };
         var msg = '--- 📊 ' + player.name + '의 통계 ---\n';
@@ -3867,11 +3907,11 @@ var commandHandlers = {
     },
 
     // --- [신규] 장비 강화 시스템 ---
-    '/강화': function(player, args, replier, sender, account) {
+    '.강화': function(player, args, replier, sender, account) {
         var part = args[0];
         var slotEng = { '무기': 'weapon', '갑옷': 'armor', '방패': 'shield' }[part];
         if (!slotEng) {
-            replier.reply('⚠️ 강화할 부위를 입력하세요. (무기/갑옷/방패)\n예: /강화 무기 [축복] - 축복의 가루 사용 시 실패해도 단계 유지');
+            replier.reply('⚠️ 강화할 부위를 입력하세요. (무기/갑옷/방패)\n예: .강화 무기 [축복] - 축복의 가루 사용 시 실패해도 단계 유지');
             return;
         }
         var equip = player.equipment[slotEng];
@@ -3929,7 +3969,7 @@ var commandHandlers = {
         if (unlocked.length > 0) resultMsg += '\n🏆 새 업적: ' + unlocked.join(', ');
         replier.reply(resultMsg + '\n(소모: 강화석 ' + stoneRequired + '개, ' + goldCost + ' G' + (useBlessing ? ', 축복의 가루 1개' : '') + ')');
     },
-    '/강화정보': function(player, args, replier, sender, account) {
+    '.강화정보': function(player, args, replier, sender, account) {
         var msg = '--- ⚒️ 장비 강화 정보 ---\n';
         ['weapon', 'armor', 'shield'].forEach(function(slot) {
             var slotKr = { weapon: '무기', armor: '갑옷', shield: '방패' }[slot];
@@ -3941,17 +3981,17 @@ var commandHandlers = {
             }
         });
         msg += '\n--- 강화 안내 ---\n';
-        msg += '• /강화 [무기/갑옷/방패] - 강화 시도\n';
-        msg += '• /강화 [부위] 축복 - 축복의 가루로 단계 보호\n';
+        msg += '• .강화 [무기/갑옷/방패] - 강화 시도\n';
+        msg += '• .강화 [부위] 축복 - 축복의 가루로 단계 보호\n';
         msg += '• 비용: 강화석 (1+레벨/2)개 + 500G×(레벨+1)\n';
         msg += '• 성공률: +0~3 90%, +4~6 70%, +7~9 40%\n';
-        msg += '• 효과: 단계당 무기/방어구 능력치 +10%\n';
-        msg += '• 강화석/축복의 가루는 /상점 특수 에서 구매';
+        msg += '• 효과: 단계당 무기.방어구 능력치 +10%\n';
+        msg += '• 강화석.축복의 가루는 .상점 특수 에서 구매';
         replier.reply(msg);
     },
 
     // --- [신규] 우편함 시스템 ---
-    '/우편함': function(player, args, replier, sender, account) {
+    '.우편함': function(player, args, replier, sender, account) {
         if (!player.mailbox) player.mailbox = [];
         var msg = '--- 📬 우편함 (' + player.mailbox.length + '통) ---\n';
         if (player.mailbox.length === 0) {
@@ -3966,13 +4006,13 @@ var commandHandlers = {
                 }
                 if (mail.message) msg += '   💬 ' + mail.message + '\n';
             });
-            msg += '\n명령어: /우편수령 [번호] - 보상 수령, /우편일괄수령 - 전체 수령';
+            msg += '\n명령어: .우편수령 [번호] - 보상 수령, .우편일괄수령 - 전체 수령';
         }
         replier.reply(msg);
     },
-    '/우편보내기': function(player, args, replier, sender, account) {
+    '.우편보내기': function(player, args, replier, sender, account) {
         if (args.length < 2) {
-            replier.reply('⚠️ 사용법: /우편보내기 [받는사람] [메시지]\n또는: /우편보내기 [받는사람] 골드 [금액] [메시지]\n또는: /우편보내기 [받는사람] 아이템 [아이템이름] [수량] [메시지]');
+            replier.reply('⚠️ 사용법: .우편보내기 [받는사람] [메시지]\n또는: .우편보내기 [받는사람] 골드 [금액] [메시지]\n또는: .우편보내기 [받는사람] 아이템 [아이템이름] [수량] [메시지]');
             return;
         }
         var targetName = args[0];
@@ -4001,21 +4041,30 @@ var commandHandlers = {
             mail.gold = amount;
             mail.message = args.slice(3).join(' ');
         } else if (args[1] === '아이템' && args.length >= 4) {
-            var qty = parseInt(args[args.length - 2]);
-            if (isNaN(qty)) { qty = 1; }
-            var itemName = args.slice(2, args.length - (isNaN(parseInt(args[args.length - 2])) ? 1 : 2)).join(' ');
-            // 단순화: /우편보내기 [이름] 아이템 [아이템이름] [수량] [메시지]
-            itemName = args[2];
-            // 더 정확한 파싱: 아이템 이름이 여러 단어일 수 있음
-            // 실제로는 args[2]가 아이템 이름의 첫 단어여서 보다 안전한 파싱이 필요
-            qty = parseInt(args[3]) || 1;
+            // 아이템 이름은 여러 단어일 수 있으므로, 첫 번째 숫자 인자를 수량으로 인식
+            var qtyIdx = -1;
+            for (var qi = 2; qi < args.length; qi++) {
+                var n = parseInt(args[qi]);
+                if (!isNaN(n) && String(n) === args[qi] && n > 0) { qtyIdx = qi; break; }
+            }
+            if (qtyIdx === -1 || qtyIdx === 2) {
+                replier.reply('⚠️ 사용법: .우편보내기 [받는사람] 아이템 [아이템이름] [수량] [메시지]');
+                return;
+            }
+            var itemName = args.slice(2, qtyIdx).join(' ');
+            var qty = parseInt(args[qtyIdx]);
+            if (!GameData.items[itemName]) {
+                replier.reply('⚠️ 존재하지 않는 아이템입니다: ' + itemName);
+                return;
+            }
             if (!player.hasItem(itemName, qty)) {
-                replier.reply('⚠️ 아이템이 부족합니다.');
+                var have = (player.inventory.find(function(i){ return i.name === itemName; }) || { count: 0 }).count;
+                replier.reply('⚠️ 아이템이 부족합니다. (필요: ' + qty + ', 보유: ' + have + ')');
                 return;
             }
             player.removeItem(itemName, qty);
             mail.items.push({ name: itemName, count: qty });
-            mail.message = args.slice(4).join(' ');
+            mail.message = args.slice(qtyIdx + 1).join(' ');
         } else {
             mail.message = args.slice(1).join(' ');
         }
@@ -4026,7 +4075,7 @@ var commandHandlers = {
         saveAccount(targetSender, targetAccount);
         replier.reply('📨 ' + targetName + '님에게 우편을 보냈습니다.');
     },
-    '/우편수령': function(player, args, replier, sender, account) {
+    '.우편수령': function(player, args, replier, sender, account) {
         if (!player.mailbox || player.mailbox.length === 0) {
             replier.reply('⚠️ 받은 우편이 없습니다.');
             return;
@@ -4048,7 +4097,7 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply(msg.trim());
     },
-    '/우편일괄수령': function(player, args, replier, sender, account) {
+    '.우편일괄수령': function(player, args, replier, sender, account) {
         if (!player.mailbox || player.mailbox.length === 0) {
             replier.reply('⚠️ 받은 우편이 없습니다.');
             return;
@@ -4075,10 +4124,10 @@ var commandHandlers = {
     },
 
     // --- [신규] 친구 시스템 ---
-    '/친구추가': function(player, args, replier, sender, account) {
+    '.친구추가': function(player, args, replier, sender, account) {
         var name = args.join(' ');
         if (!name) {
-            replier.reply('⚠️ 사용법: /친구추가 [플레이어이름]');
+            replier.reply('⚠️ 사용법: .친구추가 [플레이어이름]');
             return;
         }
         if (name === player.name) {
@@ -4100,10 +4149,10 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply('🤝 [' + name + '] 님을 친구로 추가했습니다.');
     },
-    '/친구삭제': function(player, args, replier, sender, account) {
+    '.친구삭제': function(player, args, replier, sender, account) {
         var name = args.join(' ');
         if (!name) {
-            replier.reply('⚠️ 사용법: /친구삭제 [플레이어이름]');
+            replier.reply('⚠️ 사용법: .친구삭제 [플레이어이름]');
             return;
         }
         if (!player.friends) player.friends = [];
@@ -4117,11 +4166,11 @@ var commandHandlers = {
         saveAccount(sender, account);
         replier.reply('👋 [' + name + '] 님을 친구 목록에서 삭제했습니다.');
     },
-    '/친구목록': function(player, args, replier, sender, account) {
+    '.친구목록': function(player, args, replier, sender, account) {
         if (!player.friends) player.friends = [];
         var msg = '--- 🤝 친구 목록 (' + player.friends.length + ') ---\n';
         if (player.friends.length === 0) {
-            msg += '친구가 없습니다. /친구추가 [이름] 으로 추가하세요.';
+            msg += '친구가 없습니다. .친구추가 [이름] 으로 추가하세요.';
         } else {
             player.friends.forEach(function(fname) {
                 var fSender = findSenderByName(fname);
@@ -4137,7 +4186,7 @@ var commandHandlers = {
     },
 
     // --- [신규] 일일 일괄 수령 ---
-    '/일일일괄수령': function(player, args, replier, sender, account) {
+    '.일일일괄수령': function(player, args, replier, sender, account) {
         if (!player.dailyQuests || !player.dailyQuests.quests || player.dailyQuests.quests.length === 0) {
             replier.reply('⚠️ 진행 중인 일일 퀘스트가 없습니다.');
             return;
@@ -4177,6 +4226,662 @@ var commandHandlers = {
         account.characters[player.className] = player;
         saveAccount(sender, account);
         replier.reply(msg);
+    },
+
+    // --- [신규 v3.8.0] 수산시장 등록 회수 ---
+    '.시장취소': function(player, args, replier, sender, account) {
+        if (!market[sender] || market[sender].length === 0) {
+            replier.reply('⚠️ 수산시장에 등록한 물고기가 없습니다.');
+            return;
+        }
+        var idx = parseInt(args[0]);
+        if (isNaN(idx)) {
+            // 등록 목록 표시
+            var msg = '--- 🐟 내 수산시장 등록 목록 ---\n';
+            market[sender].forEach(function(f, i) {
+                msg += (i + 1) + ') ' + f.name + ' ' + f.size + 'cm - ' + f.price + 'G\n';
+            });
+            msg += '\n명령어: .시장취소 [번호] - 해당 번호의 등록을 회수\n           .시장취소 전체 - 모든 등록 일괄 회수';
+            replier.reply(msg);
+            return;
+        }
+        if (args[0] === '전체') {
+            var refundedCount = 0;
+            market[sender].forEach(function(f) {
+                player.fishInventory.push({ name: f.name, size: f.size });
+                refundedCount++;
+            });
+            delete market[sender];
+            saveData(Config.MARKET_DATA_FILE, market);
+            account.characters[player.className] = player;
+            saveAccount(sender, account);
+            replier.reply('✅ 수산시장 등록 ' + refundedCount + '건을 모두 회수했습니다.');
+            return;
+        }
+        idx = idx - 1;
+        if (idx < 0 || idx >= market[sender].length) {
+            replier.reply('⚠️ 유효하지 않은 번호입니다.');
+            return;
+        }
+        var fish = market[sender][idx];
+        player.fishInventory.push({ name: fish.name, size: fish.size });
+        market[sender].splice(idx, 1);
+        if (market[sender].length === 0) delete market[sender];
+        saveData(Config.MARKET_DATA_FILE, market);
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        replier.reply('✅ ' + fish.name + ' ' + fish.size + 'cm 등록을 회수했습니다.');
+    },
+
+    // --- [신규 v3.8.0] 통합 도감 ---
+    '.도감': function(player, args, replier, sender, account) {
+        var cat = args[0];
+        if (!cat) {
+            replier.reply('--- 📚 통합 도감 ---\n' +
+                ' • .도감 몬스터 - 몬스터 도감\n' +
+                ' • .도감 아이템 - 아이템 도감\n' +
+                ' • .도감 물고기 - 물고기 도감\n' +
+                ' • .도감 스킬 - 직업별 스킬 도감\n' +
+                ' • .도감 펫 - 펫 도감\n' +
+                ' • .도감 칭호 - 칭호 도감\n' +
+                ' • .도감 [이름] - 특정 항목 자세히 보기');
+            return;
+        }
+        if (cat === '몬스터') {
+            var msg = '--- 👹 몬스터 도감 (' + Object.keys(GameData.monsters).length + '종) ---\n';
+            Object.keys(GameData.monsters).forEach(function(name) {
+                var m = GameData.monsters[name];
+                var killed = (player.killCount && player.killCount.byMonster[name]) || 0;
+                msg += '• ' + name + ' (HP ' + m.hp + ', 처치 ' + killed + ')\n';
+            });
+            msg += '\n💡 .도감 [몬스터이름] 으로 자세히 보기';
+            replier.reply(msg);
+            return;
+        }
+        if (cat === '아이템') {
+            var msg = '--- 🎒 아이템 도감 (' + Object.keys(GameData.items).length + '종) ---\n';
+            var groups = { weapon: [], armor: [], shield: [], consumable: [], material: [], box: [], special: [] };
+            Object.keys(GameData.items).forEach(function(name) {
+                var t = GameData.items[name].type || 'special';
+                if (groups[t]) groups[t].push(name);
+                else groups.special.push(name);
+            });
+            var typeNames = { weapon: '⚔️ 무기', armor: '🛡️ 방어구', shield: '🪧 방패', consumable: '🧪 소비', material: '🔩 재료', box: '🎁 상자', special: '✨ 특수' };
+            ['weapon', 'armor', 'shield', 'consumable', 'box', 'special', 'material'].forEach(function(t) {
+                if (groups[t].length === 0) return;
+                msg += '\n[' + typeNames[t] + ']\n';
+                msg += groups[t].join(', ') + '\n';
+            });
+            msg += '\n💡 .도감 [아이템이름] 으로 자세히 보기';
+            replier.reply(msg);
+            return;
+        }
+        if (cat === '물고기') {
+            var msg = '--- 🐟 물고기 도감 (' + Object.keys(GameData.fish).length + '종) ---\n';
+            var rarityGroups = { junk: [], common: [], uncommon: [], rare: [], epic: [], legendary: [] };
+            Object.keys(GameData.fish).forEach(function(name) {
+                var r = GameData.fish[name].rarity || 'common';
+                if (rarityGroups[r]) rarityGroups[r].push(name);
+            });
+            var rarityNames = { junk: '🗑️ 잡동사니', common: '⚪ 일반', uncommon: '🟢 고급', rare: '🔵 희귀', epic: '🟣 영웅', legendary: '🟡 전설' };
+            ['junk', 'common', 'uncommon', 'rare', 'epic', 'legendary'].forEach(function(r) {
+                if (rarityGroups[r].length === 0) return;
+                msg += '\n[' + rarityNames[r] + ']\n';
+                msg += rarityGroups[r].join(', ') + '\n';
+            });
+            replier.reply(msg);
+            return;
+        }
+        if (cat === '스킬') {
+            var msg = '--- ✨ 스킬 도감 ---\n';
+            Object.keys(GameData.classes).forEach(function(cn) {
+                var ci = GameData.classes[cn];
+                msg += '\n[' + cn + ' (' + ci.jobTier + '차)]\n';
+                Object.keys(ci.skills || {}).forEach(function(s) {
+                    var sk = ci.skills[s];
+                    msg += '• ' + s + ' (MP ' + sk.mpCost + ')\n';
+                });
+            });
+            replier.reply(msg);
+            return;
+        }
+        if (cat === '펫') {
+            var msg = '--- 🐾 펫 도감 ---\n';
+            Object.keys(GameData.pets).forEach(function(p) {
+                var pd = GameData.pets[p];
+                var bt = { att: '공격력', def: '방어력', maxHp: '최대HP' }[pd.buff.type];
+                msg += '• ' + p + ' (' + bt + ' 보너스)\n';
+                msg += '   ' + pd.description + '\n';
+            });
+            replier.reply(msg);
+            return;
+        }
+        if (cat === '칭호') {
+            var msg = '--- 🏅 칭호 도감 ---\n';
+            Object.keys(GameData.titles).forEach(function(t) {
+                var ti = GameData.titles[t];
+                var unlocked = player.level >= ti.requiredLevel;
+                msg += (unlocked ? '✅ ' : '🔒 ') + '[' + t + '] - ' + ti.requiredLevel + '레벨 (공+' + (ti.bonus.att || 0) + ' 방+' + (ti.bonus.def || 0) + ')\n';
+            });
+            replier.reply(msg);
+            return;
+        }
+        // 특정 항목 검색
+        var name = args.join(' ');
+        if (GameData.monsters[name]) {
+            return commandHandlers['.몬스터도감'](player, [name], replier, sender, account);
+        }
+        if (GameData.items[name]) {
+            return commandHandlers['.아이템도감'](player, [name], replier, sender, account);
+        }
+        if (GameData.fish[name]) {
+            var f = GameData.fish[name];
+            replier.reply('--- 🐟 ' + name + ' ---\n• 등급: ' + f.rarity + '\n• 기본 가격: ' + f.basePrice + 'G/cm');
+            return;
+        }
+        if (GameData.pets[name]) {
+            var p = GameData.pets[name];
+            var bt = { att: '공격력', def: '방어력', maxHp: '최대HP' }[p.buff.type];
+            replier.reply('--- 🐾 ' + name + ' ---\n' + p.description + '\n• 기본 ' + bt + ': +' + p.buff.baseValue + ' (성장: +' + p.buff.growth + '/Lv)');
+            return;
+        }
+        replier.reply('⚠️ 도감에서 찾을 수 없습니다. 카테고리: 몬스터/아이템/물고기/스킬/펫/칭호');
+    },
+
+    // --- [신규 v3.8.0] 길드 시스템 ---
+    '.길드창설': function(player, args, replier, sender, account) {
+        if (player.guildId) {
+            replier.reply('⚠️ 이미 길드에 소속되어 있습니다.');
+            return;
+        }
+        var name = args.join(' ');
+        if (!name) {
+            replier.reply('⚠️ 사용법: .길드창설 [길드이름]\n(창설 비용: 10000 G)');
+            return;
+        }
+        if (name.length < 2 || name.length > 12) {
+            replier.reply('⚠️ 길드 이름은 2~12자 이내로 설정해주세요.');
+            return;
+        }
+        // 중복 길드 이름 체크
+        for (var gid in guilds) {
+            if (guilds[gid].name === name) {
+                replier.reply('⚠️ 이미 존재하는 길드 이름입니다.');
+                return;
+            }
+        }
+        if (player.gold < 10000) {
+            replier.reply('⚠️ 길드 창설 비용이 부족합니다. (필요: 10000 G)');
+            return;
+        }
+        player.gold -= 10000;
+        var guildId = 'guild_' + Date.now();
+        guilds[guildId] = {
+            id: guildId,
+            name: name,
+            leader: sender,
+            members: [sender],
+            level: 1,
+            exp: 0,
+            maxExp: 1000,
+            gold: 0,
+            notice: '환영합니다! 길드에 오신 것을 축하해요.',
+            applications: [],
+            createdAt: Date.now()
+        };
+        player.guildId = guildId;
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        saveData(Config.GUILDS_DATA_FILE, guilds);
+        replier.reply('🏰 [' + name + '] 길드를 창설했습니다! (비용: 10000 G)\n길드원 모집은 .길드초대 [이름] 또는 .길드신청 으로 받을 수 있습니다.');
+    },
+    '.길드신청': function(player, args, replier, sender, account) {
+        if (player.guildId) {
+            replier.reply('⚠️ 이미 길드에 소속되어 있습니다. 먼저 .길드탈퇴 를 사용하세요.');
+            return;
+        }
+        var name = args.join(' ');
+        if (!name) {
+            replier.reply('⚠️ 사용법: .길드신청 [길드이름]\n.길드목록 으로 길드 목록을 확인하세요.');
+            return;
+        }
+        var targetGuild = null;
+        for (var gid in guilds) {
+            if (guilds[gid].name === name) { targetGuild = guilds[gid]; break; }
+        }
+        if (!targetGuild) {
+            replier.reply('⚠️ 해당 길드를 찾을 수 없습니다.');
+            return;
+        }
+        if (targetGuild.members.length >= 20) {
+            replier.reply('⚠️ 길드 인원이 가득 찼습니다. (최대 20명)');
+            return;
+        }
+        if (targetGuild.applications.indexOf(sender) > -1) {
+            replier.reply('⚠️ 이미 가입을 신청한 길드입니다.');
+            return;
+        }
+        targetGuild.applications.push(sender);
+        saveData(Config.GUILDS_DATA_FILE, guilds);
+        replier.reply('📝 [' + name + '] 길드에 가입을 신청했습니다. 길드장의 승인을 기다려주세요.');
+    },
+    '.길드수락': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild || guild.leader !== sender) {
+            replier.reply('⚠️ 길드장만 가입을 승인할 수 있습니다.');
+            return;
+        }
+        var applicantName = args.join(' ');
+        if (!applicantName) {
+            // 신청자 목록 표시
+            var msg = '--- 📝 길드 가입 신청 목록 ---\n';
+            if (guild.applications.length === 0) {
+                msg += '대기 중인 신청이 없습니다.';
+            } else {
+                guild.applications.forEach(function(s, i) {
+                    var p = players[s];
+                    var pname = p ? p.name : '(오프라인)';
+                    msg += (i + 1) + ') ' + pname + '\n';
+                });
+                msg += '\n명령어: .길드수락 [이름] / .길드거절 [이름]';
+            }
+            replier.reply(msg);
+            return;
+        }
+        var applicantSender = findSenderByName(applicantName);
+        if (!applicantSender || guild.applications.indexOf(applicantSender) === -1) {
+            replier.reply('⚠️ 해당 가입 신청을 찾을 수 없습니다.');
+            return;
+        }
+        if (guild.members.length >= 20) {
+            replier.reply('⚠️ 길드 인원이 가득 찼습니다.');
+            return;
+        }
+        var applicantAccount = accounts[applicantSender];
+        if (!applicantAccount) {
+            replier.reply('⚠️ 신청자 정보를 불러올 수 없습니다.');
+            return;
+        }
+        var applicantPlayer = applicantAccount.characters[applicantAccount.activeCharacterName];
+        if (applicantPlayer.guildId) {
+            // 이미 다른 길드 가입했음
+            guild.applications = guild.applications.filter(function(s) { return s !== applicantSender; });
+            saveData(Config.GUILDS_DATA_FILE, guilds);
+            replier.reply('⚠️ 신청자가 이미 다른 길드에 소속되어 있습니다. 신청을 자동 취소합니다.');
+            return;
+        }
+        guild.members.push(applicantSender);
+        guild.applications = guild.applications.filter(function(s) { return s !== applicantSender; });
+        applicantPlayer.guildId = guild.id;
+        saveAccount(applicantSender, applicantAccount);
+        saveData(Config.GUILDS_DATA_FILE, guilds);
+        replier.reply('✅ ' + applicantName + '님을 길드에 받아들였습니다.');
+    },
+    '.길드거절': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild || guild.leader !== sender) {
+            replier.reply('⚠️ 길드장만 신청을 거절할 수 있습니다.');
+            return;
+        }
+        var applicantName = args.join(' ');
+        if (!applicantName) {
+            replier.reply('⚠️ 사용법: .길드거절 [신청자이름]');
+            return;
+        }
+        var applicantSender = findSenderByName(applicantName);
+        if (!applicantSender || guild.applications.indexOf(applicantSender) === -1) {
+            replier.reply('⚠️ 해당 가입 신청을 찾을 수 없습니다.');
+            return;
+        }
+        guild.applications = guild.applications.filter(function(s) { return s !== applicantSender; });
+        saveData(Config.GUILDS_DATA_FILE, guilds);
+        replier.reply('✋ ' + applicantName + '님의 길드 가입 신청을 거절했습니다.');
+    },
+    '.길드초대': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild || guild.leader !== sender) {
+            replier.reply('⚠️ 길드장만 다른 플레이어를 초대할 수 있습니다.');
+            return;
+        }
+        var name = args.join(' ');
+        if (!name) {
+            replier.reply('⚠️ 사용법: .길드초대 [플레이어이름]');
+            return;
+        }
+        var targetSender = findSenderByName(name);
+        if (!targetSender) {
+            replier.reply("⚠️ '" + name + "' 플레이어를 찾을 수 없거나 오프라인 상태입니다.");
+            return;
+        }
+        var targetPlayer = players[targetSender];
+        if (targetPlayer.guildId) {
+            replier.reply('⚠️ 해당 플레이어는 이미 다른 길드에 소속되어 있습니다.');
+            return;
+        }
+        if (guildInvitations[targetSender]) {
+            replier.reply('⚠️ 해당 플레이어는 이미 다른 길드 초대를 기다리는 중입니다.');
+            return;
+        }
+        if (guild.members.length >= 20) {
+            replier.reply('⚠️ 길드 인원이 가득 찼습니다.');
+            return;
+        }
+        guildInvitations[targetSender] = guild.id;
+        replier.reply('📨 ' + name + '님에게 [' + guild.name + '] 길드 초대를 보냈습니다.');
+    },
+    '.길드초대수락': function(player, args, replier, sender, account) {
+        var guildId = guildInvitations[sender];
+        if (!guildId || !guilds[guildId]) {
+            replier.reply('⚠️ 받은 길드 초대가 없습니다.');
+            return;
+        }
+        if (player.guildId) {
+            replier.reply('⚠️ 이미 다른 길드에 소속되어 있습니다.');
+            delete guildInvitations[sender];
+            return;
+        }
+        var guild = guilds[guildId];
+        if (guild.members.length >= 20) {
+            replier.reply('⚠️ 길드 인원이 가득 찼습니다.');
+            delete guildInvitations[sender];
+            return;
+        }
+        guild.members.push(sender);
+        player.guildId = guildId;
+        delete guildInvitations[sender];
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        saveData(Config.GUILDS_DATA_FILE, guilds);
+        replier.reply('🏰 [' + guild.name + '] 길드에 가입했습니다!');
+    },
+    '.길드초대거절': function(player, args, replier, sender, account) {
+        var guildId = guildInvitations[sender];
+        if (!guildId || !guilds[guildId]) {
+            replier.reply('⚠️ 받은 길드 초대가 없습니다.');
+            return;
+        }
+        var name = guilds[guildId].name;
+        delete guildInvitations[sender];
+        replier.reply('✋ [' + name + '] 길드 초대를 거절했습니다.');
+    },
+    '.길드탈퇴': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild) {
+            player.guildId = null;
+            account.characters[player.className] = player;
+            saveAccount(sender, account);
+            replier.reply('소속된 길드를 찾을 수 없어 자동으로 탈퇴 처리되었습니다.');
+            return;
+        }
+        if (guild.leader === sender) {
+            replier.reply('⚠️ 길드장은 탈퇴할 수 없습니다. .길드해산 으로 길드를 해산하거나 .길드위임 으로 권한을 넘기세요.');
+            return;
+        }
+        guild.members = guild.members.filter(function(s) { return s !== sender; });
+        player.guildId = null;
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        saveData(Config.GUILDS_DATA_FILE, guilds);
+        replier.reply('✋ [' + guild.name + '] 길드에서 탈퇴했습니다.');
+    },
+    '.길드해산': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild || guild.leader !== sender) {
+            replier.reply('⚠️ 길드장만 길드를 해산할 수 있습니다.');
+            return;
+        }
+        if (args[0] !== '확인') {
+            replier.reply('⚠️ 길드를 해산하면 모든 길드 자금과 정보가 소실됩니다.\n확실하다면 .길드해산 확인 을 입력하세요.');
+            return;
+        }
+        var guildName = guild.name;
+        guild.members.forEach(function(memberSender) {
+            var memberAccount = accounts[memberSender] || loadAccount(memberSender);
+            if (memberAccount) {
+                for (var cn in memberAccount.characters) {
+                    var c = memberAccount.characters[cn];
+                    if (c.guildId === guild.id) c.guildId = null;
+                }
+                saveAccount(memberSender, memberAccount);
+            }
+        });
+        delete guilds[guild.id];
+        saveData(Config.GUILDS_DATA_FILE, guilds);
+        replier.reply('💥 [' + guildName + '] 길드가 해산되었습니다.');
+    },
+    '.길드위임': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild || guild.leader !== sender) {
+            replier.reply('⚠️ 길드장만 권한을 위임할 수 있습니다.');
+            return;
+        }
+        var name = args.join(' ');
+        if (!name) {
+            replier.reply('⚠️ 사용법: .길드위임 [길드원이름]');
+            return;
+        }
+        var targetSender = findSenderByName(name);
+        if (!targetSender || guild.members.indexOf(targetSender) === -1) {
+            replier.reply('⚠️ 해당 길드원을 찾을 수 없습니다.');
+            return;
+        }
+        if (targetSender === sender) {
+            replier.reply('⚠️ 자신에게 위임할 수 없습니다.');
+            return;
+        }
+        guild.leader = targetSender;
+        saveData(Config.GUILDS_DATA_FILE, guilds);
+        replier.reply('👑 [' + guild.name + '] 길드장 권한을 ' + name + '님에게 위임했습니다.');
+    },
+    '.길드추방': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild || guild.leader !== sender) {
+            replier.reply('⚠️ 길드장만 길드원을 추방할 수 있습니다.');
+            return;
+        }
+        var name = args.join(' ');
+        if (!name) {
+            replier.reply('⚠️ 사용법: .길드추방 [길드원이름]');
+            return;
+        }
+        var targetSender = findSenderByName(name);
+        if (!targetSender || guild.members.indexOf(targetSender) === -1) {
+            replier.reply('⚠️ 해당 길드원을 찾을 수 없습니다.');
+            return;
+        }
+        if (targetSender === sender) {
+            replier.reply('⚠️ 자기 자신을 추방할 수 없습니다.');
+            return;
+        }
+        guild.members = guild.members.filter(function(s) { return s !== targetSender; });
+        var targetAccount = accounts[targetSender] || loadAccount(targetSender);
+        if (targetAccount) {
+            for (var cn in targetAccount.characters) {
+                var c = targetAccount.characters[cn];
+                if (c.guildId === guild.id) c.guildId = null;
+            }
+            saveAccount(targetSender, targetAccount);
+        }
+        saveData(Config.GUILDS_DATA_FILE, guilds);
+        replier.reply('💢 ' + name + '님을 길드에서 추방했습니다.');
+    },
+    '.길드정보': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.\n.길드창설 [이름] 으로 새 길드를 만들거나, .길드목록 으로 가입할 길드를 찾아보세요.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild) {
+            player.guildId = null;
+            account.characters[player.className] = player;
+            saveAccount(sender, account);
+            replier.reply('⚠️ 소속된 길드 정보를 찾을 수 없어 자동 탈퇴되었습니다.');
+            return;
+        }
+        var leaderName = players[guild.leader] ? players[guild.leader].name : '(오프라인)';
+        var msg = '--- 🏰 길드 정보 ---\n';
+        msg += '• 이름: ' + guild.name + '\n';
+        msg += '• 길드장: ' + leaderName + '\n';
+        msg += '• 레벨: ' + guild.level + ' (EXP: ' + guild.exp + '/' + guild.maxExp + ')\n';
+        msg += '• 길드원: ' + guild.members.length + '/20\n';
+        msg += '• 길드 자금: ' + guild.gold + ' G\n';
+        msg += '• 공지: ' + (guild.notice || '없음') + '\n';
+        if (guild.leader === sender && guild.applications.length > 0) {
+            msg += '\n📝 가입 대기 중: ' + guild.applications.length + '명 (.길드수락 으로 확인)';
+        }
+        replier.reply(msg);
+    },
+    '.길드원': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild) { replier.reply('⚠️ 길드 정보를 찾을 수 없습니다.'); return; }
+        var msg = '--- 🏰 [' + guild.name + '] 길드원 (' + guild.members.length + '/20) ---\n';
+        guild.members.forEach(function(memberSender) {
+            var p = players[memberSender];
+            var name = p ? p.name : null;
+            // 오프라인 멤버는 파일에서 로드
+            if (!name) {
+                var ma = accounts[memberSender] || loadAccount(memberSender);
+                if (ma && ma.characters[ma.activeCharacterName]) {
+                    name = ma.characters[ma.activeCharacterName].name;
+                    p = ma.characters[ma.activeCharacterName];
+                }
+            }
+            if (!name) name = '(데이터 없음)';
+            var lvInfo = p ? ' (Lv.' + p.level + ' ' + p.className + ')' : '';
+            var role = (memberSender === guild.leader) ? ' 👑' : '';
+            var status = players[memberSender] ? ' 🟢' : ' ⚫';
+            msg += '• ' + name + lvInfo + role + status + '\n';
+        });
+        replier.reply(msg.trim());
+    },
+    '.길드기부': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild) { replier.reply('⚠️ 길드 정보를 찾을 수 없습니다.'); return; }
+        var amount = parseInt(args[0]);
+        if (isNaN(amount) || amount <= 0) {
+            replier.reply('⚠️ 사용법: .길드기부 [금액]\n기부 시 길드 자금이 증가하고, 길드 경험치도 같이 오릅니다 (10% 비율).');
+            return;
+        }
+        if (player.gold < amount) {
+            replier.reply('⚠️ 골드가 부족합니다.');
+            return;
+        }
+        player.gold -= amount;
+        guild.gold += amount;
+        guild.exp += Math.floor(amount * 0.1);
+        var levelUp = false;
+        while (guild.exp >= guild.maxExp) {
+            guild.exp -= guild.maxExp;
+            guild.level++;
+            guild.maxExp = Math.floor(guild.maxExp * 1.5);
+            levelUp = true;
+        }
+        account.characters[player.className] = player;
+        saveAccount(sender, account);
+        saveData(Config.GUILDS_DATA_FILE, guilds);
+        var msg = '💎 [' + guild.name + '] 길드에 ' + amount + ' G를 기부했습니다.\n경험치 +' + Math.floor(amount * 0.1);
+        if (levelUp) msg += '\n🎉 길드 레벨업! 현재 길드 레벨: ' + guild.level;
+        replier.reply(msg);
+    },
+    '.길드공지': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild) { replier.reply('⚠️ 길드 정보를 찾을 수 없습니다.'); return; }
+        if (guild.leader !== sender) {
+            replier.reply('⚠️ 길드장만 공지를 변경할 수 있습니다.');
+            return;
+        }
+        var notice = args.join(' ');
+        if (!notice) {
+            replier.reply('현재 공지: ' + (guild.notice || '없음') + '\n사용법: .길드공지 [내용]');
+            return;
+        }
+        if (notice.length > 100) {
+            replier.reply('⚠️ 공지는 100자 이내로 작성해주세요.');
+            return;
+        }
+        guild.notice = notice;
+        saveData(Config.GUILDS_DATA_FILE, guilds);
+        replier.reply('📢 길드 공지가 변경되었습니다:\n' + notice);
+    },
+    '.길드채팅': function(player, args, replier, sender, account) {
+        if (!player.guildId) {
+            replier.reply('⚠️ 소속된 길드가 없습니다.');
+            return;
+        }
+        var guild = guilds[player.guildId];
+        if (!guild) { replier.reply('⚠️ 길드 정보를 찾을 수 없습니다.'); return; }
+        var text = args.join(' ');
+        if (!text) {
+            replier.reply('⚠️ 사용법: .길드채팅 [메시지]');
+            return;
+        }
+        var formatted = '🏰 [' + guild.name + '|' + player.name + ']: ' + text;
+        replier.reply(formatted + '\n(길드원 ' + guild.members.length + '명에게 표시)');
+    },
+    '.길드목록': function(player, args, replier, sender, account) {
+        var allGuilds = [];
+        for (var gid in guilds) {
+            allGuilds.push(guilds[gid]);
+        }
+        if (allGuilds.length === 0) {
+            replier.reply('--- 🏰 길드 목록 ---\n등록된 길드가 없습니다.\n.길드창설 [이름] 으로 첫 길드를 만들어보세요!');
+            return;
+        }
+        allGuilds.sort(function(a, b) {
+            return b.level - a.level || b.members.length - a.members.length;
+        });
+        var msg = '--- 🏰 길드 랭킹 ---\n';
+        allGuilds.slice(0, 15).forEach(function(g, i) {
+            var leaderName = '(오프라인)';
+            if (players[g.leader]) leaderName = players[g.leader].name;
+            else {
+                var la = accounts[g.leader] || loadAccount(g.leader);
+                if (la && la.characters[la.activeCharacterName]) leaderName = la.characters[la.activeCharacterName].name;
+            }
+            msg += (i + 1) + '. [Lv.' + g.level + '] ' + g.name + ' (' + g.members.length + '/20) - 길드장: ' + leaderName + '\n';
+        });
+        msg += '\n💡 .길드신청 [이름] 으로 가입 신청';
+        replier.reply(msg);
     }
 };
 
@@ -4188,40 +4893,42 @@ function checkPlayerState(player, cmd) {
     var state = null;
     var allowedCommands = [];
     var message = "";
-    var alwaysAllowed = ['/내정보', '/인벤토리', '/장비', '/퀘스트', '/내캐릭터', '/저장', '/도움말', '/명령어',
-                          '/펫', '/펫정보', '/캐릭터변경', '/통계', '/칭호', '/업적', '/일일퀘스트', '/스킬목록',
-                          '/우편함', '/우편수령', '/우편일괄수령', '/친구목록', '/강화정보'];
-    var combatSkills = ['/강타', '/파이어볼', '/힐', '/독바르기',
-                         '/분노폭발', '/신성한방패', '/메테오', '/골렘소환', '/암살', '/훔치기', '/부활', '/아수라파천무'];
+    var alwaysAllowed = ['.내정보', '.인벤토리', '.장비', '.퀘스트', '.내캐릭터', '.저장', '.도움말', '.명령어',
+                          '.펫', '.펫정보', '.캐릭터변경', '.통계', '.칭호', '.업적', '.일일퀘스트', '.스킬목록',
+                          '.우편함', '.우편수령', '.우편일괄수령', '.친구목록', '.강화정보',
+                          '.도감', '.몬스터도감', '.아이템도감',
+                          '.길드정보', '.길드원', '.길드목록', '.길드초대수락', '.길드초대거절'];
+    var combatSkills = ['.강타', '.파이어볼', '.힐', '.독바르기',
+                         '.분노폭발', '.신성한방패', '.메테오', '.골렘소환', '.암살', '.훔치기', '.부활', '.아수라파천무'];
 
     if (battleSession[sender]) {
         state = "battle";
-        allowedCommands = ['/공격', '/도망', '/사용'].concat(combatSkills).concat(alwaysAllowed);
+        allowedCommands = ['.공격', '.도망', '.사용'].concat(combatSkills).concat(alwaysAllowed);
         message = getBattleStatus(sender);
     } else if (pvpSession[sender]) {
         state = "pvp";
-        allowedCommands = ['/공격', '/도망', '/사용'].concat(combatSkills).concat(alwaysAllowed);
+        allowedCommands = ['.공격', '.도망', '.사용'].concat(combatSkills).concat(alwaysAllowed);
         message = getPvpStatus(sender);
     } else if (player.party && raidSession[player.party]) {
         state = "raid";
-        allowedCommands = ['/어비스공격', '/어비스포기', '/사용', '/파티챗'].concat(combatSkills).concat(alwaysAllowed);
+        allowedCommands = ['.어비스공격', '.어비스포기', '.사용', '.파티챗'].concat(combatSkills).concat(alwaysAllowed);
         message = getRaidStatus(player.party);
     } else if (restSession[sender]) {
         state = "rest";
-        allowedCommands = ['/취침중단'].concat(alwaysAllowed);
-        message = "현재 휴식 중입니다... (/취침중단 으로 취소)";
+        allowedCommands = ['.취침중단'].concat(alwaysAllowed);
+        message = "현재 휴식 중입니다... (.취침중단 으로 취소)";
     } else if (fishingSession[sender]) {
         state = "fishing";
-        allowedCommands = ['/낚시중지'].concat(alwaysAllowed);
-        message = "현재 낚시 중입니다... (/낚시중지 로 취소)";
+        allowedCommands = ['.낚시중지'].concat(alwaysAllowed);
+        message = "현재 낚시 중입니다... (.낚시중지 로 취소)";
     } else if (shopSession[sender]) {
         state = "shop";
-        allowedCommands = ['/구매', '/나가기', '/상점'].concat(alwaysAllowed);
-        message = "현재 상점 이용 중입니다... (/구매, /나가기 사용 가능)";
+        allowedCommands = ['.구매', '.나가기', '.상점'].concat(alwaysAllowed);
+        message = "현재 상점 이용 중입니다... (.구매, .나가기 사용 가능)";
     } else if (tradeSessions[sender]) {
         state = "trade";
-        allowedCommands = ['/거래올리기', '/거래골드', '/거래확인', '/거래취소'].concat(alwaysAllowed);
-        message = "현재 거래 중입니다... (/거래취소 로 취소)";
+        allowedCommands = ['.거래올리기', '.거래골드', '.거래확인', '.거래취소'].concat(alwaysAllowed);
+        message = "현재 거래 중입니다... (.거래취소 로 취소)";
     }
 
     if (state && allowedCommands.indexOf(cmd) === -1) {
@@ -4231,7 +4938,7 @@ function checkPlayerState(player, cmd) {
 }
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
-    if (!msg.startsWith('/')) {
+    if (!msg.startsWith('.')) {
         return;
     }
 
@@ -4257,11 +4964,11 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     var args = msg.split(' ').slice(1);
 
     if (!player) {
-        var allowedGuestCommands = ['/생성', '/rpg', '/명령어', '/도움말', '/내캐릭터', '/캐릭터변경'];
+        var allowedGuestCommands = ['.생성', '.rpg', '.명령어', '.도움말', '.내캐릭터', '.캐릭터변경'];
         if (allowedGuestCommands.indexOf(cmd) !== -1) {
             commandHandlers[cmd](null, args, replier, sender, account);
         } else {
-            replier.reply('🌳 묘냥의 숲에 오신 것을 환영합니다! 🌳\n"/생성 [이름] [직업]"으로 먼저 캐릭터를 만들어주세요.\n\n💡 직업: 전사, 마법사, 도적, 힐러\n💡 캐릭터 생성 후 /튜토리얼 명령어로 게임을 천천히 익혀보세요!');
+            replier.reply('🌳 묘냥의 숲에 오신 것을 환영합니다! 🌳\n".생성 [이름] [직업]"으로 먼저 캐릭터를 만들어주세요.\n\n💡 직업: 전사, 마법사, 도적, 힐러\n💡 캐릭터 생성 후 .튜토리얼 명령어로 게임을 천천히 익혀보세요!');
         }
         return;
     }
@@ -4276,16 +4983,16 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     if (handler) {
         try {
             handler(player, args, replier, sender, account);
-            // 첫 명령 실행 후 출석/우편 힌트 (한 세션에 한 번씩만)
+            // 첫 명령 실행 후 출석.우편 힌트 (한 세션에 한 번씩만)
             try {
                 var todayStr = new Date().toISOString().slice(0, 10);
-                if (!attendanceHintSent[sender] && cmd !== '/출석' && player.lastAttendance !== todayStr) {
+                if (!attendanceHintSent[sender] && cmd !== '.출석' && player.lastAttendance !== todayStr) {
                     attendanceHintSent[sender] = true;
-                    replier.reply('💡 오늘 아직 출석체크를 하지 않았어요! /출석 명령어로 보상을 받아보세요.');
+                    replier.reply('💡 오늘 아직 출석체크를 하지 않았어요! .출석 명령어로 보상을 받아보세요.');
                 }
-                if (!mailHintSent[sender] && cmd !== '/우편함' && player.mailbox && player.mailbox.length > 0) {
+                if (!mailHintSent[sender] && cmd !== '.우편함' && player.mailbox && player.mailbox.length > 0) {
                     mailHintSent[sender] = true;
-                    replier.reply('📬 새로운 우편 ' + player.mailbox.length + '통이 도착했어요. /우편함 으로 확인해보세요!');
+                    replier.reply('📬 새로운 우편 ' + player.mailbox.length + '통이 도착했어요. .우편함 으로 확인해보세요!');
                 }
             } catch (hintErr) {
                 // 힌트 실패는 메인 흐름을 막지 않음
@@ -4295,7 +5002,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
             replier.reply("죄송합니다. 명령어 처리 중 오류가 발생했습니다. 관리자에게 문의해주세요.");
         }
     } else {
-        replier.reply("⚠️ 알 수 없는 명령어입니다. /명령어 또는 /도움말 을 확인해주세요.");
+        replier.reply("⚠️ 알 수 없는 명령어입니다. .명령어 또는 .도움말 을 확인해주세요.");
     }
 }
 
